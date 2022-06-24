@@ -348,3 +348,7 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+/DunkSearch/DunkSearch.Importer/appsettings.json
+/DunkSearch/DunkSearch.Importer/appsettings.Development.json
+/DunkSearch/DunkSearch.WebApp/appsettings.json
+/DunkSearch/DunkSearch.WebApp/appsettings.Development.json

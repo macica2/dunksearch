@@ -1,0 +1,127 @@
+﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
+for details on configuring this project to bundle and minify static web assets. */
+
+a.navbar-brand {
+  white-space: normal;
+  text-align: center;
+  word-break: break-all;
+}
+
+/* Provide sufficient contrast against white background */
+a {
+  color: #0366d6;
+}
+
+.btn-primary {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+  color: #fff;
+  background-color: #1b6ec2;
+  border-color: #1861ac;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  font-size: 14px;
+}
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.border-top {
+  border-top: 1px solid #e5e5e5;
+}
+.border-bottom {
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.box-shadow {
+  box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+button.accept-policy {
+  font-size: 1rem;
+  line-height: inherit;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 60px;
+}
+.footer {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  white-space: nowrap;
+  line-height: 60px; /* Vertically center the text there */
+}
+
+/* Home page styles */
+.advanced-filters-container {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+/* Search Result styles */
+.search-results-container {
+    margin-top: 10px;
+}
+.search-result-col {
+    margin-bottom: 10px;
+}
+.search-result-col-inner {
+    border: 1px solid black;
+    border-radius: 3px;
+    height: 100%;
+    cursor: pointer;
+}
+.search-result-col-inner:hover {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+}
+.video-thumbnail-container {
+    position: relative;
+}
+.video-thumbnail {
+    width: 100%;
+}
+.video-timestamp {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: #333333;
+    color: #ffffff;
+    padding: 0 3px 0 3px;
+}
+.video-title {
+    position: absolute;
+    top: 0;
+    left: 0;
+    background-color: #333333;
+    color: white;
+    max-width: 75%;
+    text-align: left;
+}
+
+/* FAQ styles */
+#unsupported-videos-table th,
+#unsupported-videos-table td {
+    padding: 6px;
+    border: 1px solid #dddddd;
+}
+#unsupported-videos-table tr:nth-child(even) {
+    background-color: whitesmoke;
+}

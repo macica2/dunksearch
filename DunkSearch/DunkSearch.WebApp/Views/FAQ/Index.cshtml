@@ -1,0 +1,128 @@
+﻿@model DunkSearch.Domain.Models.ViewModels.FAQViewModel
+@{
+    ViewData["Title"] = "Frequently Asked Questions";
+}
+
+<div class="container">
+    <h4 style="text-align:center">Frequently Asked Questions</h4>
+    <div id="accordion">
+        <div class="card">
+            <div class="card-header" id="headingOne">
+                <h5 class="mb-0">
+                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                        Why can't I find what I'm looking for?
+                    </button>
+                </h5>
+            </div>
+            <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                <div class="card-body">
+                    <ul>
+                        <li>Try using the advanced filters to narrow down the results</li>
+                        <li>Try searching for a key word or 2 instead of an entire quote. Sometimes different words have better results.</li>
+                        <li>Try alternate spellings of words, since sometimes the auto-generated captions aren't quite right.</li>
+                        <li>If the quote was broken into multiple captions, such as "I'll have the spaghetti" and "and meatballs", then you may need to try searching for just one part of the quote.</li>
+                        <li>For videos with auto-generated subtitles, certain swear words are replaced with [ __ ] which is not searchable. If your search term includes a swear and the captions are auto-generated, then you likely won't be able to find the quote without changing your search term.</li>
+                        <li>Some videos are not able to be searched. See the <i>Are there any supported videos?</i> question below.</li>
+                        <li>If you still cannot find a quote, try asking in the Weekly Search Megathread on the <a href="https://www.reddit.com/r/videogamedunkey/" target="_blank">videogamedunkey subreddit.</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header" id="headingTwo">
+                <h5 class="mb-0">
+                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                        How does the search work behind the scenes?
+                    </button>
+                </h5>
+            </div>
+            <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                <div class="card-body">
+                    <ul>
+                        <li>I extracted the captions from all of Dunkey's YouTube videos. I processed these captions and entered them into a database to make them easily searchable.</li>
+                        <li>The search functionality is built using PostgreSQL Full Text Search. Each line of a caption gets parsed into key words. For example, the quote "I'll have the spaghetti and meatballs" gets broken down into TODO.</li>
+                        <li>When a search term is entered, it will also be broken down into key words. The site will then try to find captions that have those key words in common.</li>
+                        <li>Search results are sorted in order of video upload date, then by the timestamp in the video.</li>
+                        <li>You can view all the source code here TODO to see how it works behind the scenes.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header" id="headingThree">
+                <h5 class="mb-0">
+                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                        Are there any unsupported videos?
+                    </button>
+                </h5>
+            </div>
+            <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+                <div class="card-body">
+                    <ul>
+                        <li>Below is a list of videos that cannot be searched, with a reason explaining why.</li>
+                        <li>If anyone would like to volunteer to create captions for any of these videos, please reach out TODO WHERE?</li>
+                        <li>It is currently unknown if Dunkey will add community-submitted captions to his videos.</li>
+                        <li>In addition, it make take time for recently uploaded videos to be added to the site. You can search for a video using the advanced filters to see if it has been added yet.</li>
+                    </ul>
+                    <table id="unsupported-videos-table">
+                        <tr>
+                            <th>Video</th>
+                            <th>Why is it not searchable?</th>
+                        </tr>
+                        <tr>
+                            <td>Any unlisted videos as of 6/21/22</td>
+                            <td>They are unlisted for a reason</td>
+                        </tr>
+                        @foreach (var unsupportedVideo in Model.UnsupportedVideos)
+                        {
+                            <tr>
+                            <td><a href="@("https://www.youtube.com/watch?v=" + unsupportedVideo.YTVideoId)" target="_blank">@unsupportedVideo.Title</a></td>
+                            <td>@unsupportedVideo.Reason</td>
+                        </tr>
+                        }
+                        
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header" id="headingFour">
+                <h5 class="mb-0">
+                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                        How much does it cost to run the site? Can I donate to support the site?
+                    </button>
+                </h5>
+            </div>
+            <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordion">
+                <div class="card-body">
+                    The total yearly cost to run the site is $X.
+                    <ul>
+                        <li>$15/month for the managed PostgreSQL database with DigitalOcean</li>
+                        <li>$6/month for the web server with DigitalOcean</li>
+                        <li>$X/year for the domain name</li>
+                    </ul>
+                    Once the site is launched and in use, I will consider setting up the ability to donate. I don't want to run ads if I don't have to.
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header" id="headingFive">
+                <h5 class="mb-0">
+                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                        Can I make a suggestion, provide feedback, or help with the site?
+                    </button>
+                </h5>
+            </div>
+            <div id="collapseFive" class="collapse" aria-labelledby="headingFive" data-parent="#accordion">
+                <div class="card-body">
+                    Sure. If you know how to use GitHub, you can submit a pull request or an issue TODO LINK.
+                    You can also message me on Reddit HERE or post a comment in the Weekly Search Megathread on the <a href="https://www.reddit.com/r/videogamedunkey/" target="_blank">videogamedunkey subreddit.</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

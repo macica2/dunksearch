@@ -1,0 +1,286 @@
+﻿@model DunkSearch.Domain.Models.ViewModels.HomeViewModel
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">DunkSearch</h1>
+    <p>Search for captions from videogamedunkey videos</p>
+    @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "SearchForm" }))
+    {
+        @Html.HiddenFor(p => p.PageSize)
+        @Html.HiddenFor(p => p.PageNumber)
+        <div class="container">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        @Html.TextBoxFor(p => p.SearchTerm, new { @placeholder = "Enter a search term...", @class = "form-control" })
+                    </div>
+                    <a id="advanced-filters-btn" class="btn btn-secondary" data-toggle="collapse" href="#advancedFilters" role="button" aria-expanded="false" aria-controls="advancedFilters">
+                        Advanced Filters
+                    </a>
+                    <button id="search-btn" class="btn btn-primary" type="submit">Search</button>
+                </div>
+            </div>
+            <div class="collapse advanced-filters-container" id="advancedFilters">
+                <div class="card card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(p => p.ChannelId)
+                                <select id="ChannelId" name="ChannelId" class="form-control" style="width:100%;">
+                                    <option value=""></option>
+                                    @foreach (var channelOption in Model.ChannelOptions)
+                                    {
+                                        <option value="@channelOption.id">@channelOption.text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(p => p.VideoId)
+                                <select id="VideoId" name="VideoId" class="form-control" style="width:100%;"></select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(p => p.UploadDateFrom)
+                                @Html.TextBoxFor(p => p.UploadDateFrom, new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(p => p.UploadDateTo)
+                                @Html.TextBoxFor(p => p.UploadDateTo, new { @class = "form-control" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                @Html.LabelFor(p => p.CaptionTypeId)
+                                <select id="CaptionTypeId" name="CaptionTypeId" class="form-control" style="width:100%;">
+                                    <option value=""></option>
+                                    @foreach (var captionTypeOption in Model.CaptionTypeOptions)
+                                    {
+                                        <option value="@captionTypeOption.id">@captionTypeOption.text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    } <!-- End of form -->
+
+    <div id="SearchResultsPartial"></div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="youtubeVideoModal" tabindex="-1" role="dialog" aria-labelledby="youtubeVideoModalTitle" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width:fit-content">
+            <div class="modal-content">
+                <div class="modal-body" id="youtube-modal-body">
+                    <div id="youtube-player"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" />
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script type="text/javascript">
+
+    // Keep track if search was clicked. 
+    // Used to prevent loading on small devices if scrolling to bottom is possible before searching.
+    var searchStarted = false;
+
+    $(document).ready(function ()
+    {
+        //
+        // Set up the datepickers
+        //
+        initializeDatepicker("UploadDateFrom", "UploadDateTo", "setStartDate");
+        initializeDatepicker("UploadDateTo", "UploadDateFrom", "setEndDate");
+
+        //
+        // Set up the select2 dropdowns
+        //
+        $("#ChannelId").select2({
+            width: 'resolve',
+            minimumResultsForSearch: -1,
+            allowClear: true,
+            placeholder: "Select a channel"
+        });
+
+        $("#CaptionTypeId").select2({
+            width: 'resolve',
+            minimumResultsForSearch: -1,
+            allowClear: true,
+            placeholder: "Select a caption language"
+        });
+
+        $("#VideoId").select2({
+            ajax: {
+                url: '/Video/GetSelectItems',
+                data: function (params)
+                {
+                    var query = {
+                        searchTerm: params.term
+                    }
+
+                    // Query parameters will be ?searchTerm=[term]
+                    return query;
+                }
+            },
+            width: 'resolve',
+            minimumInputLength: 3,
+            allowClear: true,
+            placeholder: "Select a video"
+        });
+
+        //
+        // Set up the form submit listener to load the search results.
+        // Used for starting new searches
+        //
+        $('#SearchForm').on('submit', function (e)
+        {
+            // prevents form from submitting standard way, causing page refresh
+            e.preventDefault();
+            console.log("in onSubmit");
+            searchStarted = true;
+
+            // do nothing if nothing or whitespace was entered in the search bar
+            var searchTerm = $("#SearchTerm").val();
+            if (!searchTerm || !searchTerm.trim())
+            {
+                return; 
+            }
+
+            // If the advanced filters section is showing, hide it
+            if ($("#advancedFilters").hasClass("show"))
+            {
+                $("#advanced-filters-btn").click();
+            }
+
+            // Reset page number to 1 if user is starting a new search after paging
+            $("#PageNumber").val(1);
+
+            $.post('/Home/Search', $(this).serialize(), function (results)
+            {
+                // replace existing search results if there were any
+                $('#SearchResultsPartial').html(results);
+            });
+        });
+
+        //
+        // Register infinite loading logic
+        //
+        $(window).scroll(function ()
+        {
+            if (!searchStarted)
+            {
+                return;
+            }
+
+            var docHeight = $(document).height(); // the height of the entire web page regardless of what's currently visible
+            var windowHeight = $(this).height(); // the height of the page that's currently visible in the browser window
+            var scrollTopHeight = $(this).scrollTop(); // how many pixels down has the vertical scroll bar moved
+            // if the difference between docHeight and windowHeight equals scrollTopHeight, it means 
+            // you have scroleld to the very bottom of the page.
+            // Add a few pixels of leeway so it loads without having to scroll to the exact bottom
+            //console.log("Document height: " + $(document).height() + " | this height: " + $(this).height() + " | scrollTop: " + $(this).scrollTop());
+            if ((docHeight - windowHeight) <= (scrollTopHeight + 20))
+            {
+                console.log('Scrolled to Bottom' + Math.random());
+
+                // Increment page for search
+                var curPageNum = parseInt($("#PageNumber").val());
+                if (curPageNum == -1)
+                {
+                    return; // don't try to load more results if we set this flag
+                }
+                $("#PageNumber").val(curPageNum + 1);
+
+                $.post('/Home/Search', $("#SearchForm").serialize(), function (results)
+                {
+                    // add new results instead of overwriting
+                    $('#SearchResultsPartial').append(results); 
+                });
+            }
+        });
+
+        //
+        //
+        //
+        $('#youtubeVideoModal').on('hidden.bs.modal', function (e)
+        {
+            // when user closes modal, unload the modal contents to stop the video
+            // and prepare it for the next video
+            $("#youtube-modal-body").html("<div id='youtube-player'></div>");
+        })
+
+        //
+        // Register the YouTube IFrame player asynchronously
+        //
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    });
+
+    /**
+     * Initializes the bootstrap datepicker and makes it so
+     * the dependent datepicker date range is limited by the input datepicker
+     */
+    function initializeDatepicker(inputPickerId, dependentPickerId, methodName)
+    {
+        $("#" + inputPickerId).datepicker({
+            clearBtn: true
+        });
+        $("#" + inputPickerId).on("changeDate", function (selected)
+        {
+            var cutoffDate = (selected.date == null) ? null : new Date(selected.date.valueOf())
+            $("#" + dependentPickerId).datepicker(methodName, cutoffDate);
+        });
+    }
+
+    function showYouTubePlayer(videoId, startSeconds)
+    {
+        console.log('starting showYouTubePlayer');
+        $("#youtube-player").html(null);
+        var defaultPlayerWidth = 640;
+        // if not enough room for default width, use dynamic width based on screen size.
+        var playerWidth = Math.min(window.innerWidth - 50, defaultPlayerWidth);
+        var playerHeight = (playerWidth * 9) / 16; // ensures player is in 16:9 format
+        var player = new YT.Player('youtube-player', {
+            width: playerWidth,
+            height: playerHeight, 
+            videoId: videoId,
+            playerVars: {
+                playsinline: 1,
+                start: startSeconds,
+                enablejsapi: 1,
+                autoplay: 1,
+            },
+            events: {
+                //< !-- 'onReady': onPlayerReady, -- >
+                //< !-- 'onStateChange': onPlayerStateChange-- >
+            }
+        });
+
+        $('#youtubeVideoModal').modal('show')
+    }
+
+    //function onYouTubeIframeAPIReady()
+    //{
+    //    console.log("YT API READY");
+    //}
+
+</script>

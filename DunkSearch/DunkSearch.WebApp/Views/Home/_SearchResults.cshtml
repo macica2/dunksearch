@@ -1,0 +1,46 @@
+﻿@model DunkSearch.Domain.Models.ServiceModels.Caption.CaptionListResponse
+@{
+
+}
+
+@if (!Model.IsSuccessful)
+{
+    <p>Oopsie woopsie! There was an error: @Model.Message</p>
+}
+else if (Model.Captions == null || Model.Captions.Count == 0)
+{
+    if (Model.PageNumber == 1)
+    {
+        <div style="margin-top:20px">
+            <p><strong>No results found.</strong> Try using advanced filters or change the search term.</p>
+        </div>
+    }
+}
+else
+{
+    <div class="container-fluid search-results-container">
+        <div class="row">
+            @foreach (var caption in Model.Captions)
+            {
+                <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 search-result-col">
+                    <div class="search-result-col-inner" onclick="showYouTubePlayer('@caption.Video.YTVideoId', @caption.StartSeconds)">
+                        <div class="video-thumbnail-container">
+                            <img class="video-thumbnail" src="@("http://img.youtube.com/vi/" + caption.Video.YTVideoId  + "/mqdefault.jpg")" />
+                            @*<div class="video-title"><span>@caption.Video.Title</span></div>*@
+                            <span class="video-timestamp">@caption.Timestamp</span>
+                        </div>
+                        <p>@caption.CaptionText</p>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+
+<!-- If we reached the end of the results, set flag so we don't keep infinite loading -->
+@if (@Model.Captions == null || !Model.Captions.Any() || !Model.IsSuccessful)
+{
+    <script type="text/javascript">
+        $("#PageNumber").val(-1);
+    </script>
+}
