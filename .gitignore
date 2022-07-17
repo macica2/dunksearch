@@ -352,3 +352,4 @@ MigrationBackup/
 /DunkSearch/DunkSearch.Importer/appsettings.Development.json
 /DunkSearch/DunkSearch.WebApp/appsettings.json
 /DunkSearch/DunkSearch.WebApp/appsettings.Development.json
+/DunkSearch/DunkSearch.WebApp/.config/dotnet-tools.json

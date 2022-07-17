@@ -10,6 +10,9 @@ namespace DunkSearch.Domain.Entities
         [Column("unsupported_video_id")]
         public int UnsupportedVideoId { get; set; }
 
+        [Column("channel_id")]
+        public int ChannelId { get; set; }
+
         [Column("yt_video_id")]
         public string YTVideoId { get; set; }
 
@@ -18,5 +21,7 @@ namespace DunkSearch.Domain.Entities
 
         [Column("reason")]
         public string Reason { get; set; }
+
+        public virtual Channel Channel { get; set; }
     }
 }

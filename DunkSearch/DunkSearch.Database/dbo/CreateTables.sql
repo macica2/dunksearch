@@ -40,7 +40,7 @@ CREATE INDEX ON caption USING GIST (caption_text_vector);
 
 CREATE TABLE app_event_log
 (
-	app_event_log_id INTEGER GENERATED ALWAYS AS IDENTIY PRIMARY KEY,
+	app_event_log_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 	event_type TEXT NOT NULL,
 	event_details TEXT NULL,
 	ip_address INET NULL
@@ -50,6 +50,7 @@ CREATE TABLE app_event_log
 CREATE TABLE unsupported_video
 (
 	unsupported_video_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+	channel_id INTEGER REFERENCES channel(channel_id) NOT NULL,
 	yt_video_id TEXT NOT NULL,
 	title TEXT NOT NULL,
 	reason TEXT NOT NULL

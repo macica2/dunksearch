@@ -50,8 +50,25 @@ namespace DunkSearch.Domain.Services
             //
             // Build query starting with filters
             //
-            var query = _dataContext.Captions.Include("Video")
-                            .Where(p => p.CaptionTextVector.Matches(EF.Functions.PlainToTsQuery("english", request.SearchTerm)));
+            var query = _dataContext.Captions.Include("Video");
+
+            // some people leave spaces in the beginning of their search somehow, so trim both sides to be safe
+            request.SearchTerm = request.SearchTerm.Trim();
+
+            // If the seach term was wrapped in quotes like "This", then serach for the exact string,
+            // otherwise use the FTS Vector for a faster search
+            if (request.SearchTerm.StartsWith('\"') && request.SearchTerm.EndsWith('\"'))
+            {
+                var sanitizedSearchTerm = request.SearchTerm.Substring(1, request.SearchTerm.Length - 2); // remove the beginning and end quotes
+                sanitizedSearchTerm = sanitizedSearchTerm.ToLower();
+                sanitizedSearchTerm = sanitizedSearchTerm.Replace("[ __ ]", "[ __ ]"); // Censored swears are actually stored with ascii char 160, not space which is char 32
+                query = query.Where(p => p.CaptionText.ToLower().Contains(sanitizedSearchTerm));
+            }
+            else
+            {
+                query = query.Where(p => p.CaptionTextVector.Matches(EF.Functions.PlainToTsQuery("english", request.SearchTerm)));
+            }
+                            
             if (request.ChannelId != null)
             {
                 query = query.Where(p => p.Video.ChannelId == request.ChannelId);
@@ -77,7 +94,8 @@ namespace DunkSearch.Domain.Services
             // Apply sorting and paging
             //     
             response.Captions = query.OrderBy(p => p.Video.UploadDate)
-                                .ThenBy(p => p.StartSeconds)
+                                .ThenBy(p => p.Video.Title)
+                                .ThenBy(p => p.StartSeconds)                                
                                 .Skip((request.PageNumber - 1) * request.PageSize)
                                 .Take(request.PageSize)
                                 .ToList();

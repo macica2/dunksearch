@@ -100,6 +100,8 @@
     // Keep track if search was clicked. 
     // Used to prevent loading on small devices if scrolling to bottom is possible before searching.
     var searchStarted = false;
+    // Keep track if search is currently being performed so we don't load many pages at once when scrolling
+    var searchInProgress = false;
 
     $(document).ready(function ()
     {
@@ -153,7 +155,7 @@
         {
             // prevents form from submitting standard way, causing page refresh
             e.preventDefault();
-            console.log("in onSubmit");
+            //console.log("in onSubmit");
             searchStarted = true;
 
             // do nothing if nothing or whitespace was entered in the search bar
@@ -184,7 +186,7 @@
         //
         $(window).scroll(function ()
         {
-            if (!searchStarted)
+            if (!searchStarted || searchInProgress)
             {
                 return;
             }
@@ -192,13 +194,15 @@
             var docHeight = $(document).height(); // the height of the entire web page regardless of what's currently visible
             var windowHeight = $(this).height(); // the height of the page that's currently visible in the browser window
             var scrollTopHeight = $(this).scrollTop(); // how many pixels down has the vertical scroll bar moved
+            var scrollTopHeightTwo = document.body.scrollTop;
             // if the difference between docHeight and windowHeight equals scrollTopHeight, it means 
             // you have scroleld to the very bottom of the page.
             // Add a few pixels of leeway so it loads without having to scroll to the exact bottom
-            //console.log("Document height: " + $(document).height() + " | this height: " + $(this).height() + " | scrollTop: " + $(this).scrollTop());
-            if ((docHeight - windowHeight) <= (scrollTopHeight + 20))
+            //console.log("Document height: " + docHeight + " | this height: " + windowHeight + " | scrollTop: " + scrollTopHeight + " test: " + scrollTopHeightTwo);
+            
+            if ((docHeight - windowHeight) <= (scrollTopHeight + 200)) // leave 200px of leeway, because on mobile browsers it never truly reaches the bottom
             {
-                console.log('Scrolled to Bottom' + Math.random());
+                //console.log('Scrolled to Bottom' + Math.random());
 
                 // Increment page for search
                 var curPageNum = parseInt($("#PageNumber").val());
@@ -207,11 +211,12 @@
                     return; // don't try to load more results if we set this flag
                 }
                 $("#PageNumber").val(curPageNum + 1);
-
+                searchInProgress = true;
                 $.post('/Home/Search', $("#SearchForm").serialize(), function (results)
                 {
                     // add new results instead of overwriting
                     $('#SearchResultsPartial').append(results); 
+                    searchInProgress = false;
                 });
             }
         });
@@ -253,7 +258,7 @@
 
     function showYouTubePlayer(videoId, startSeconds)
     {
-        console.log('starting showYouTubePlayer');
+        //console.log('starting showYouTubePlayer');
         $("#youtube-player").html(null);
         var defaultPlayerWidth = 640;
         // if not enough room for default width, use dynamic width based on screen size.

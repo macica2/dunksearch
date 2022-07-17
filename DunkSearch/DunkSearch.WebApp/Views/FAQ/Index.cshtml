@@ -20,6 +20,7 @@
                         <li>Try using the advanced filters to narrow down the results</li>
                         <li>Try searching for a key word or 2 instead of an entire quote. Sometimes different words have better results.</li>
                         <li>Try alternate spellings of words, since sometimes the auto-generated captions aren't quite right.</li>
+                        <li>You can wrap your search in quotes "like this" to search for an exact text match. This ignores capitalization.</li>
                         <li>If the quote was broken into multiple captions, such as "I'll have the spaghetti" and "and meatballs", then you may need to try searching for just one part of the quote.</li>
                         <li>For videos with auto-generated subtitles, certain swear words are replaced with [ __ ] which is not searchable. If your search term includes a swear and the captions are auto-generated, then you likely won't be able to find the quote without changing your search term.</li>
                         <li>Some videos are not able to be searched. See the <i>Are there any supported videos?</i> question below.</li>
@@ -41,10 +42,10 @@
                 <div class="card-body">
                     <ul>
                         <li>I extracted the captions from all of Dunkey's YouTube videos. I processed these captions and entered them into a database to make them easily searchable.</li>
-                        <li>The search functionality is built using PostgreSQL Full Text Search. Each line of a caption gets parsed into key words. For example, the quote "I'll have the spaghetti and meatballs" gets broken down into TODO.</li>
+                        <li>The search functionality is built using PostgreSQL Full Text Search. Each line of a caption gets parsed into key words. For example, the quote "I'll have the spaghetti and meatballs" gets broken down into "ll':2 'meatbal':7 'spaghetti':5".</li>
                         <li>When a search term is entered, it will also be broken down into key words. The site will then try to find captions that have those key words in common.</li>
                         <li>Search results are sorted in order of video upload date, then by the timestamp in the video.</li>
-                        <li>You can view all the source code here TODO to see how it works behind the scenes.</li>
+                        <li>You can view all the source code <a href="https://github.com/macica2/dunksearch" target="_blank">here</a> to learn more.</li>
                     </ul>
                 </div>
             </div>
@@ -61,26 +62,28 @@
             <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
                 <div class="card-body">
                     <ul>
-                        <li>Below is a list of videos that cannot be searched, with a reason explaining why.</li>
-                        <li>If anyone would like to volunteer to create captions for any of these videos, please reach out TODO WHERE?</li>
-                        <li>It is currently unknown if Dunkey will add community-submitted captions to his videos.</li>
-                        <li>In addition, it make take time for recently uploaded videos to be added to the site. You can search for a video using the advanced filters to see if it has been added yet.</li>
+                        <li>Below is a list of videos that cannot be searched, with a reason explaining why. It is currently unknown if Dunkey or Leah will accept community-submitted captions for these videos.</li>
+                        <li>In addition, it may take time for recently uploaded videos to be added to the site. You can search for a video using the advanced filters to see if it has been added yet.</li>
+                        <li>Stream archives from Walter .NO are not currently supported, but will be added in the future if there is enough interest.</li>
                     </ul>
                     <table id="unsupported-videos-table">
                         <tr>
+                            <th>Channel</th>
                             <th>Video</th>
                             <th>Why is it not searchable?</th>
                         </tr>
                         <tr>
-                            <td>Any unlisted videos as of 6/21/22</td>
+                            <td>All</td>
+                            <td>Any unlisted videos</td>
                             <td>They are unlisted for a reason</td>
                         </tr>
                         @foreach (var unsupportedVideo in Model.UnsupportedVideos)
                         {
                             <tr>
-                            <td><a href="@("https://www.youtube.com/watch?v=" + unsupportedVideo.YTVideoId)" target="_blank">@unsupportedVideo.Title</a></td>
-                            <td>@unsupportedVideo.Reason</td>
-                        </tr>
+                                <td>@unsupportedVideo.Channel.Name</td>
+                                <td><a href="@("https://www.youtube.com/watch?v=" + unsupportedVideo.YTVideoId)" target="_blank">@unsupportedVideo.Title</a></td>
+                                <td>@unsupportedVideo.Reason</td>
+                            </tr>
                         }
                         
                     </table>
@@ -98,11 +101,11 @@
             </div>
             <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordion">
                 <div class="card-body">
-                    The total yearly cost to run the site is $X.
+                    The total monthly cost to run the site is $21.76.
                     <ul>
                         <li>$15/month for the managed PostgreSQL database with DigitalOcean</li>
                         <li>$6/month for the web server with DigitalOcean</li>
-                        <li>$X/year for the domain name</li>
+                        <li>$0.76/month for the domain name with Porkbun</li>
                     </ul>
                     Once the site is launched and in use, I will consider setting up the ability to donate. I don't want to run ads if I don't have to.
                 </div>
@@ -119,8 +122,8 @@
             </div>
             <div id="collapseFive" class="collapse" aria-labelledby="headingFive" data-parent="#accordion">
                 <div class="card-body">
-                    Sure. If you know how to use GitHub, you can submit a pull request or an issue TODO LINK.
-                    You can also message me on Reddit HERE or post a comment in the Weekly Search Megathread on the <a href="https://www.reddit.com/r/videogamedunkey/" target="_blank">videogamedunkey subreddit.</a>
+                    Sure. If you know how to use <a href="https://github.com/macica2/dunksearch" target="_blank">GitHub</a>, you can submit a pull request or an issue.
+                    You can also try posting a comment in the Weekly Search Megathread on the <a href="https://www.reddit.com/r/videogamedunkey/" target="_blank">videogamedunkey subreddit.</a>
                 </div>
             </div>
         </div>

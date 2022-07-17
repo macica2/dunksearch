@@ -66,4 +66,7 @@
   <ItemGroup>
     <None Include="dbo\DeleteDatabase.sql" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="dbo\ApplySecurity.sql" />
+  </ItemGroup>
 </Project>
