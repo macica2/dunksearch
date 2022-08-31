@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 
 namespace DunkSearch.Domain.Models.ServiceModels.Caption
@@ -13,7 +14,7 @@ namespace DunkSearch.Domain.Models.ServiceModels.Caption
 
         public string SearchTerm { get; set; }
 
-        public int? ChannelId { get; set; }
+        public List<int> ChannelIds { get; set; }
 
         public int? VideoId { get; set; }
 

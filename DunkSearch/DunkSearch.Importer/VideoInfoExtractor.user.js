@@ -44,12 +44,21 @@
                 // Now that the transcript is showing, we can get the timestamps if transcript is showing
                 var timestamps = document.getElementsByClassName("segment-timestamp style-scope ytd-transcript-segment-renderer");
                 var captions = document.getElementsByClassName("segment-text style-scope ytd-transcript-segment-renderer");
-                var captionLanguage = document.getElementById("label-text").innerText;
+                var captionLanguageLabel = document.getElementById("label-text");
+                var captionLanguage;
+                if (captionLanguageLabel == null)
+                {
+                    captionLanguage = "English (auto-generated)";
+                }
+                else
+                {
+                    captionLanguage = captionLanguageLabel.innerText;
+                }
 
                 // Grab other general information about the video
                 var vidId = window.location.href.split("?v=")[1].split("&")[0];
                 var vidTitle = document.getElementsByClassName("title style-scope ytd-video-primary-info-renderer")[0].innerText;
-                var vidDate = document.getElementById("info-strings").children[1].innerText;
+                var vidDate = document.getElementById("info-strings").children[1].innerText.replace("Priemered ", "");
 
                 //var captionsOutput = "";
                 var transcript = [];
@@ -86,7 +95,7 @@
                 a.href = URL.createObjectURL(file);
                 a.download = fileName + '.json';
                 a.click();
-            }, 1000);
+            }, 2000);
         }, 1000);
     }, 3000);
 })();

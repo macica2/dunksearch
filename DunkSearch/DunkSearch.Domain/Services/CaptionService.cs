@@ -69,9 +69,9 @@ namespace DunkSearch.Domain.Services
                 query = query.Where(p => p.CaptionTextVector.Matches(EF.Functions.PlainToTsQuery("english", request.SearchTerm)));
             }
                             
-            if (request.ChannelId != null)
+            if (request.ChannelIds != null && request.ChannelIds.Count > 0)
             {
-                query = query.Where(p => p.Video.ChannelId == request.ChannelId);
+                query = query.Where(p => request.ChannelIds.Contains(p.Video.ChannelId));
             }
             if (request.CaptionTypeId != null)
             {

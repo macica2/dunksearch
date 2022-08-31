@@ -3,5 +3,7 @@
     public class VideoListRequest
     {
         public string Title { get; set; }
+
+        public int? VideoId { get; set; }
     }
 }

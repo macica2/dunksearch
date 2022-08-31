@@ -11,11 +11,10 @@ namespace DunkSearch.Domain.Models.ViewModels
         [Display(Name = "Search Term")]
         public string SearchTerm { get; set; }
 
-        [Display(Name = "Channel")]
-        public int? ChannelId { get; set; }
-
         [Display(Name = "Video")]
         public int? VideoId { get; set; }
+
+        public string DefaultVideoName { get; set; }
 
         [Display(Name = "Caption Language")]
         public int? CaptionTypeId { get; set; }
@@ -32,7 +31,9 @@ namespace DunkSearch.Domain.Models.ViewModels
 
         //public int SearchMode { get; set; }
 
-        public List<SelectListItem> ChannelOptions { get; set; }
+        public List<ChannelChoiceModel> ChannelOptions { get; set; }
+
+        public List<int> ChannelIds { get; set; }
 
         public List<SelectListItem> CaptionTypeOptions { get; set; }
     }

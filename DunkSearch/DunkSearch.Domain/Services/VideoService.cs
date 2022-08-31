@@ -24,6 +24,10 @@ namespace DunkSearch.Domain.Services
                 {
                     query = query.Where(p => p.Title.ToLower().Contains(request.Title.ToLower()));
                 }
+                if (request.VideoId != null)
+                {
+                    query = query.Where(p => p.VideoId == request.VideoId);    
+                }
                 response.Videos = query.ToList();
                 response.IsSuccessful = true;
             }
