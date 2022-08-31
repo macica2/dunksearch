@@ -29,5 +29,7 @@ namespace DunkSearch.Domain.Models.ServiceModels.Caption
         public int PageNumber { get; set; }
 
         public IPAddress IPAddress { get; set; }
+
+        public string SearchMode { get; set; }
     }
 }

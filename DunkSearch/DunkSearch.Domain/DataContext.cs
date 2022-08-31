@@ -24,6 +24,14 @@ namespace DunkSearch.Domain
                     p => new { p.CaptionText })  // Included properties
                 .HasIndex(p => p.CaptionTextVector)
                 .HasMethod("GIST"); // Index method on the search vector (GIN or GIST)
+
+            modelBuilder.Entity<Caption>()
+                .HasGeneratedTsVectorColumn(
+                    p => p.CaptionTextSimpleVector,
+                    "simple",  // Text search config
+                    p => new { p.CaptionText })  // Included properties
+                .HasIndex(p => p.CaptionTextSimpleVector)
+                .HasMethod("GIST"); // Index method on the search vector (GIN or GIST)
         }
 
         public DbSet<Channel> Channels { get; set; }

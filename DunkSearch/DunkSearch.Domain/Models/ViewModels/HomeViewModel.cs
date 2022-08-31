@@ -31,10 +31,14 @@ namespace DunkSearch.Domain.Models.ViewModels
 
         //public int SearchMode { get; set; }
 
+        [Display(Name = "Channels")]
         public List<ChannelChoiceModel> ChannelOptions { get; set; }
-
+        
         public List<int> ChannelIds { get; set; }
 
         public List<SelectListItem> CaptionTypeOptions { get; set; }
+
+        [Display(Name = "Search Mode")]
+        public string SearchMode { get; set; }
     }
 }

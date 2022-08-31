@@ -5,7 +5,7 @@
 
 <div class="text-center">
     <h1 class="display-4 page-title">DunkSearch</h1>
-    <p>Search for captions from videogamedunkey videos</p>
+    <p>Search video captions from Dunkey and friends</p>
     @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "SearchForm" }))
     {
         @Html.HiddenFor(p => p.PageSize)
@@ -18,40 +18,49 @@
                         <div class="input-group-append">
                             <button id="search-btn" class="btn btn-primary" type="submit">Search</button>
                         </div>
+                        <div class="input-group-append">
+                            <a id="advanced-filters-btn" class="btn btn-outline-secondary" data-toggle="collapse" href="#advancedFilters" role="button" aria-expanded="true" aria-controls="advancedFilters">
+                                <svg class="icon icon-cog">
+                                    <use xlink:href="#icon-cog"></use>
+                                </svg>
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
-            <div class="row">
-                <div class="col-md-8">
-                    <div>
-                        @for (int i = 0; i < Model.ChannelOptions.Count; i++)
-                        {
-                            <label for="ChannelOptions[@i].Selected">@Model.ChannelOptions[i].ChannelName</label>
-                            @Html.CheckBoxFor(p => p.ChannelOptions[i].Selected, new { @class = "channel-choice", id = "ChannelOptions[" + i + "].Selected" })
-                            @Html.HiddenFor(p => p.ChannelOptions[i].ChannelId)
 
-                        }
-                    </div>
-                </div>
-                <div class="col-md-2">
-                    <p>Search mode:</p>
-                    <input type="radio" />
-                    <label>Accurate mode</label>
-                    <input type="radio" />
-                    <label>Fuzzy mode</label>
-                </div>
-                <div class="col-md-2">
-                    <a id="advanced-filters-btn" class="btn btn-secondary" data-toggle="collapse" href="#advancedFilters" role="button" aria-expanded="false" aria-controls="advancedFilters">
-                        More Filters
-                    </a>
-                </div>
-            </div>
-            <div class="collapse advanced-filters-container" id="advancedFilters">
+            <div class="collapse advanced-filters-container show" id="advancedFilters">
                 <div class="card card-body">
                     <div class="row">
                         <div class="col-md-6">
+                            <div class="control-label">
+                                @Html.LabelFor(p => p.ChannelOptions, new { @class = "control-label label-required" })
+                            </div>
+                            <div>
+                                @for (int i = 0; i < Model.ChannelOptions.Count; i++)
+                                {
+                                    <label for="ChannelOptions[@i].Selected" class="channel-label">@Model.ChannelOptions[i].ChannelName</label>
+                                    @Html.CheckBoxFor(p => p.ChannelOptions[i].Selected, new { @class = "channel-choice", id = "ChannelOptions[" + i + "].Selected" })
+                                    @Html.HiddenFor(p => p.ChannelOptions[i].ChannelId)
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="control-label">
+                                @Html.LabelFor(p => p.SearchMode, new { @class = "control-label label-required" })
+                            </div>
+                            <div>
+                                <label>Simple </label>
+                                @Html.RadioButtonFor(p => p.SearchMode, "Simple")
+                                <label style="margin-left:10px">Fuzzy </label>
+                                @Html.RadioButtonFor(p => p.SearchMode, "Fuzzy")
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
                             <div class="form-group">
-                                @Html.LabelFor(p => p.VideoId)
+                                @Html.LabelFor(p => p.VideoId, new { @class = "control-label" })
                                 <select id="VideoId" name="VideoId" class="form-control" style="width:100%;">
                                     @if (Model.VideoId != null)
                                     {
@@ -62,7 +71,7 @@
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                @Html.LabelFor(p => p.CaptionTypeId)
+                                @Html.LabelFor(p => p.CaptionTypeId, new { @class = "control-label" })
                                 <select id="CaptionTypeId" name="CaptionTypeId" class="form-control" style="width:100%;" asp-for="@Model.CaptionTypeId">
                                     <option value=""></option>
                                     @foreach (var captionTypeOption in Model.CaptionTypeOptions)
@@ -76,13 +85,13 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                @Html.LabelFor(p => p.UploadDateFrom)
+                                @Html.LabelFor(p => p.UploadDateFrom, new { @class = "control-label" })
                                 @Html.TextBoxFor(p => p.UploadDateFrom, new { @class = "form-control" })
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="form-group">
-                                @Html.LabelFor(p => p.UploadDateTo)
+                                @Html.LabelFor(p => p.UploadDateTo, new { @class = "control-label" })
                                 @Html.TextBoxFor(p => p.UploadDateTo, new { @class = "form-control" })
                             </div>
                         </div>
@@ -106,6 +115,15 @@
     </div>
 </div>
 
+<!-- SVG for the cog, from icomoon.io -->
+<svg aria-hidden="true" style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <symbol id="icon-cog" viewBox="0 0 32 32">
+            <path d="M29.181 19.070c-1.679-2.908-0.669-6.634 2.255-8.328l-3.145-5.447c-0.898 0.527-1.943 0.829-3.058 0.829-3.361 0-6.085-2.742-6.085-6.125h-6.289c0.008 1.044-0.252 2.103-0.811 3.070-1.679 2.908-5.411 3.897-8.339 2.211l-3.144 5.447c0.905 0.515 1.689 1.268 2.246 2.234 1.676 2.903 0.672 6.623-2.241 8.319l3.145 5.447c0.895-0.522 1.935-0.82 3.044-0.82 3.35 0 6.067 2.725 6.084 6.092h6.289c-0.003-1.034 0.259-2.080 0.811-3.038 1.676-2.903 5.399-3.894 8.325-2.219l3.145-5.447c-0.899-0.515-1.678-1.266-2.232-2.226zM16 22.479c-3.578 0-6.479-2.901-6.479-6.479s2.901-6.479 6.479-6.479c3.578 0 6.479 2.901 6.479 6.479s-2.901 6.479-6.479 6.479z"></path>
+        </symbol>
+    </defs>
+</svg>
+
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" />
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
@@ -114,7 +132,7 @@
 <link href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" rel="stylesheet" />
 <script type="text/javascript">
 
-    // Keep track if search was clicked. 
+    // Keep track if search was clicked.
     // Used to prevent loading on small devices if scrolling to bottom is possible before searching.
     var searchStarted = false;
     // Keep track if search is currently being performed so we don't load many pages at once when scrolling
@@ -183,7 +201,7 @@
             var searchTerm = $("#SearchTerm").val();
             if (!searchTerm || !searchTerm.trim())
             {
-                return; 
+                return;
             }
 
             // If the advanced filters section is showing, hide it
@@ -219,11 +237,11 @@
             var windowHeight = $(this).height(); // the height of the page that's currently visible in the browser window
             var scrollTopHeight = $(this).scrollTop(); // how many pixels down has the vertical scroll bar moved
             var scrollTopHeightTwo = document.body.scrollTop;
-            // if the difference between docHeight and windowHeight equals scrollTopHeight, it means 
+            // if the difference between docHeight and windowHeight equals scrollTopHeight, it means
             // you have scroleld to the very bottom of the page.
             // Add a few pixels of leeway so it loads without having to scroll to the exact bottom
             //console.log("Document height: " + docHeight + " | this height: " + windowHeight + " | scrollTop: " + scrollTopHeight + " test: " + scrollTopHeightTwo);
-            
+
             if ((docHeight - windowHeight) <= (scrollTopHeight + 200)) // leave 200px of leeway, because on mobile browsers it never truly reaches the bottom
             {
                 //console.log('Scrolled to Bottom' + Math.random());
@@ -239,7 +257,7 @@
                 $.post('/Home/Search', $("#SearchForm").serialize(), function (results)
                 {
                     // add new results instead of overwriting
-                    $('#SearchResultsPartial').append(results); 
+                    $('#SearchResultsPartial').append(results);
                     searchInProgress = false;
                 });
             }
@@ -298,7 +316,7 @@
         var playerHeight = (playerWidth * 9) / 16; // ensures player is in 16:9 format
         var player = new YT.Player('youtube-player', {
             width: playerWidth,
-            height: playerHeight, 
+            height: playerHeight,
             videoId: videoId,
             playerVars: {
                 playsinline: 1,
@@ -326,6 +344,7 @@
         updateUrlParam(url, "CaptionTypeId", $("#CaptionTypeId").val());
         updateUrlParam(url, "UploadDateFrom", $("#UploadDateFrom").val());
         updateUrlParam(url, "UploadDateTo", $("#UploadDateTo").val());
+        updateUrlParam(url, "SearchMode", $("input[name='SearchMode']:checked").val());
         var channelIds = [];
         var channelCheckboxes = $(".channel-choice");
         for (var i = 0; i < channelCheckboxes.length; i++)

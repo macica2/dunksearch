@@ -47,7 +47,7 @@ namespace DunkSearch.WebApp.Controllers
                 model.ChannelOptions.Add(new ChannelChoiceModel()
                 {
                     ChannelId = channel.ChannelId,
-                    ChannelName= channel.Name,
+                    ChannelName = channel.Name,
                     Selected = (channel.Name == "videogamedunkey") // by default only check dunkey
                 });
             };
@@ -98,6 +98,8 @@ namespace DunkSearch.WebApp.Controllers
                 }
             }
 
+            model.SearchMode = model.SearchMode ?? "Simple"; // default to Simple search mode if not passed in
+
             model.PageSize = 24;
             model.PageNumber = 1;
             return View(model);
@@ -116,7 +118,8 @@ namespace DunkSearch.WebApp.Controllers
                 UploadDateTo = model.UploadDateTo,
                 PageNumber = model.PageNumber,
                 PageSize = model.PageSize,
-                IPAddress = Request.HttpContext.Connection.RemoteIpAddress
+                IPAddress = Request.HttpContext.Connection.RemoteIpAddress,
+                SearchMode = model.SearchMode
             });
 
             return PartialView("_SearchResults", response);

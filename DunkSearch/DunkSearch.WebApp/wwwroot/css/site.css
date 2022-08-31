@@ -119,6 +119,36 @@ a.ui-button:active,
     margin-bottom: 10px;
 }
 
+.control-label {
+    font-weight: bold;
+}
+
+@media (max-width: 1199px) {
+    .channel-label {
+        min-width: 44%;
+    }
+}
+
+.icon {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    stroke-width: 0;
+    stroke: currentColor;
+    fill: currentColor;
+}
+
+.icon-cog {
+    font-size: 17px
+}
+
+.label-required::after {
+    content: "*";
+    font-weight: bold;
+    color: red;
+    margin-left: 2px;
+}
+
 /* Search Result styles */
 .search-results-container {
     margin-top: 10px;

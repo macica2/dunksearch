@@ -28,6 +28,9 @@ namespace DunkSearch.Domain.Entities
         [Column("caption_text_vector")]
         public NpgsqlTsVector CaptionTextVector { get; set; }
 
+        [Column("caption_text_simple_vector")]
+        public NpgsqlTsVector CaptionTextSimpleVector { get; set; }
+
         public virtual Video Video { get; set; }
         public virtual CaptionType CaptionType { get; set; }
 

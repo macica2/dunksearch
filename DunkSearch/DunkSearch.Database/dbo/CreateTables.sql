@@ -35,8 +35,15 @@ ALTER TABLE caption
 ADD COLUMN caption_text_vector tsvector
 GENERATED ALWAYS AS (to_tsvector('english', coalesce(caption_text, ''))) STORED;
 
+/* Add another vector which doesn't use the English dictionary, so it includes stop words for more exact searches */
+ALTER TABLE caption
+ADD COLUMN caption_text_simple_vector tsvector
+GENERATED ALWAYS AS (to_tsvector('simple', coalesce(caption_text, ''))) STORED;
+
+
 /* Add index for speeding up searches */
 CREATE INDEX ON caption USING GIST (caption_text_vector);
+CREATE INDEX ON caption USING GIST (caption_text_simple_vector);
 
 CREATE TABLE app_event_log
 (

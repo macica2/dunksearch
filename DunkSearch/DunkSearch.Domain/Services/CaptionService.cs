@@ -63,12 +63,19 @@ namespace DunkSearch.Domain.Services
                 sanitizedSearchTerm = sanitizedSearchTerm.ToLower();
                 sanitizedSearchTerm = sanitizedSearchTerm.Replace("[ __ ]", "[ __ ]"); // Censored swears are actually stored with ascii char 160, not space which is char 32
                 query = query.Where(p => p.CaptionText.ToLower().Contains(sanitizedSearchTerm));
+
             }
             else
             {
-                query = query.Where(p => p.CaptionTextVector.Matches(EF.Functions.PlainToTsQuery("english", request.SearchTerm)));
+                if (request.SearchMode == "Fuzzy")
+                {
+                    query = query.Where(p => p.CaptionTextVector.Matches(EF.Functions.PhraseToTsQuery("english", request.SearchTerm)));
+                }
+                else
+                {
+                    query = query.Where(p => p.CaptionTextSimpleVector.Matches(EF.Functions.PlainToTsQuery("simple", request.SearchTerm)));
+                }
             }
-                            
             if (request.ChannelIds != null && request.ChannelIds.Count > 0)
             {
                 query = query.Where(p => request.ChannelIds.Contains(p.Video.ChannelId));
