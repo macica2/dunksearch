@@ -30,6 +30,6 @@ namespace DunkSearch.Domain.Models.ServiceModels.Caption
 
         public IPAddress IPAddress { get; set; }
 
-        public string SearchMode { get; set; }
+        public Enums.SearchMode SearchMode { get; set; }
     }
 }

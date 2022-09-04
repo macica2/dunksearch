@@ -9,30 +9,22 @@ namespace DunkSearch.Domain.Services
     public class CaptionService : ICaptionService
     {
         private DataContext _dataContext;
-        public CaptionService(DataContext dataContext)
+        private IAppEventLogService _appEventLogService;
+        public CaptionService(DataContext dataContext, IAppEventLogService appEventLogService)
         {
             _dataContext = dataContext;
+            _appEventLogService = appEventLogService;
         }
 
         public CaptionListResponse ListCaptions(CaptionListRequest request)
         {
             // Log this search attempt
-            try
+            _appEventLogService.CreateLog(new Models.ServiceModels.AppEventLogService.AppEventLogCreateRequest()
             {
-                var searchLog = new AppEventLog()
-                {
-                    CreateDate = DateTime.Now,
-                    EventType = "Search",
-                    IPAddress = request.IPAddress,
-                    EventDetails = request.SearchTerm + " | " + request.PageNumber
-                };
-                _dataContext.Add(searchLog);
-                _dataContext.SaveChanges();
-            }
-            catch (Exception ex)
-            {
-                // do nothing for now
-            }
+                EventType = "Search",
+                IPAddress = request.IPAddress,
+                EventDetails = request.SearchTerm + " | " + request.PageNumber + " | " + request.SearchMode + " | " + String.Join(",", request.ChannelIds)
+            });
 
             //var pageSize = request.PageSize pass this in? and page number.
             var response = new CaptionListResponse()
@@ -67,13 +59,13 @@ namespace DunkSearch.Domain.Services
             }
             else
             {
-                if (request.SearchMode == "Fuzzy")
+                if (request.SearchMode == Domain.Enums.SearchMode.Fuzzy)
                 {
-                    query = query.Where(p => p.CaptionTextVector.Matches(EF.Functions.PhraseToTsQuery("english", request.SearchTerm)));
+                    query = query.Where(p => p.CaptionTextVector.Matches(EF.Functions.PlainToTsQuery("english", request.SearchTerm)));
                 }
                 else
                 {
-                    query = query.Where(p => p.CaptionTextSimpleVector.Matches(EF.Functions.PlainToTsQuery("simple", request.SearchTerm)));
+                    query = query.Where(p => p.CaptionTextSimpleVector.Matches(EF.Functions.PhraseToTsQuery("simple", request.SearchTerm)));
                 }
             }
             if (request.ChannelIds != null && request.ChannelIds.Count > 0)

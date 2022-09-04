@@ -38,7 +38,11 @@ namespace DunkSearch.Domain.Models.ViewModels
 
         public List<SelectListItem> CaptionTypeOptions { get; set; }
 
+        /// <summary>
+        /// I want the URL to just show the value, not the enum name.
+        /// And if I use enum instead of int, then it doesn't bind properly to radio button.
+        /// </summary>
         [Display(Name = "Search Mode")]
-        public string SearchMode { get; set; }
+        public int SearchMode { get; set; }
     }
 }

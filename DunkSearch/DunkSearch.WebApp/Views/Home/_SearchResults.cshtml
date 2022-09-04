@@ -26,10 +26,14 @@ else
                     <div class="search-result-col-inner" onclick="showYouTubePlayer('@caption.Video.YTVideoId', @caption.StartSeconds)">
                         <div class="video-thumbnail-container">
                             <img class="video-thumbnail" src="@("https://img.youtube.com/vi/" + caption.Video.YTVideoId  + "/mqdefault.jpg")" />
-                            @*<div class="video-title"><span>@caption.Video.Title</span></div>*@
                             <span class="video-timestamp">@caption.Timestamp</span>
                         </div>
-                        <p>@caption.CaptionText</p>
+                        <div>
+                            <div class="video-title" title="@caption.Video.Title">@caption.Video.Title</div>
+                        </div>
+                        <div class="video-caption">
+                            @caption.CaptionText
+                        </div>
                     </div>
                 </div>
             }

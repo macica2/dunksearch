@@ -28,6 +28,7 @@ namespace DunkSearch.WebApp
             services.AddTransient<IVideoService, VideoService>();
             services.AddTransient<ICaptionTypeService, CaptionTypeService>();
             services.AddTransient<IUnsupportedVideoService, UnsupportedVideoService>();
+            services.AddTransient<IAppEventLogService, AppEventLogService>();
             var mvcBuilder = services.AddControllersWithViews();
 #if DEBUG
             mvcBuilder.AddRazorRuntimeCompilation(); // makes it so we can refresh browser to see cshtml changes during development

@@ -98,7 +98,8 @@ namespace DunkSearch.WebApp.Controllers
                 }
             }
 
-            model.SearchMode = model.SearchMode ?? "Simple"; // default to Simple search mode if not passed in
+            // default to Normal search mode if not passed in
+            model.SearchMode = model.SearchMode == 0 ? (int)Domain.Enums.SearchMode.Normal : model.SearchMode; 
 
             model.PageSize = 24;
             model.PageNumber = 1;
@@ -119,7 +120,7 @@ namespace DunkSearch.WebApp.Controllers
                 PageNumber = model.PageNumber,
                 PageSize = model.PageSize,
                 IPAddress = Request.HttpContext.Connection.RemoteIpAddress,
-                SearchMode = model.SearchMode
+                SearchMode = (Domain.Enums.SearchMode)model.SearchMode
             });
 
             return PartialView("_SearchResults", response);

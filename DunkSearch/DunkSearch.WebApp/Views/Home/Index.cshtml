@@ -1,4 +1,5 @@
-﻿@model DunkSearch.Domain.Models.ViewModels.HomeViewModel
+﻿@using DunkSearch.Domain.Enums;
+@model DunkSearch.Domain.Models.ViewModels.HomeViewModel
 @{
     ViewData["Title"] = "Home Page";
 }
@@ -36,24 +37,29 @@
                             <div class="control-label">
                                 @Html.LabelFor(p => p.ChannelOptions, new { @class = "control-label label-required" })
                             </div>
-                            <div>
+                            <div class="row">
                                 @for (int i = 0; i < Model.ChannelOptions.Count; i++)
                                 {
-                                    <label for="ChannelOptions[@i].Selected" class="channel-label">@Model.ChannelOptions[i].ChannelName</label>
-                                    @Html.CheckBoxFor(p => p.ChannelOptions[i].Selected, new { @class = "channel-choice", id = "ChannelOptions[" + i + "].Selected" })
-                                    @Html.HiddenFor(p => p.ChannelOptions[i].ChannelId)
+                                    <div class="col-sm-6">
+                                        <label for="ChannelOptions[@i].Selected" class="channel-label">@Model.ChannelOptions[i].ChannelName</label>
+                                        @Html.CheckBoxFor(p => p.ChannelOptions[i].Selected, new { @class = "channel-choice", id = "ChannelOptions[" + i + "].Selected" })
+                                        @Html.HiddenFor(p => p.ChannelOptions[i].ChannelId)
+                                    </div>
                                 }
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="control-label">
                                 @Html.LabelFor(p => p.SearchMode, new { @class = "control-label label-required" })
+                                <i data-toggle="tooltip" data-placement="top" title="See the FAQs page for a full explanation of search modes" style="margin-left:5px">
+                                    <svg class="icon icon-question"><use xlink:href="#icon-question"></use></svg>
+                                </i>
                             </div>
                             <div>
-                                <label>Simple </label>
-                                @Html.RadioButtonFor(p => p.SearchMode, "Simple")
+                                <label>Normal </label>
+                                @Html.RadioButtonFor(p => p.SearchMode, (int)SearchMode.Normal, new { @class = "home-radio-btn" })
                                 <label style="margin-left:10px">Fuzzy </label>
-                                @Html.RadioButtonFor(p => p.SearchMode, "Fuzzy")
+                                @Html.RadioButtonFor(p => p.SearchMode, (int)SearchMode.Fuzzy, new { @class = "home-radio-btn" })                               
                             </div>
                         </div>
                     </div>
@@ -123,13 +129,21 @@
         </symbol>
     </defs>
 </svg>
+<!-- SVG for the question mark icon, from icomoon.io -->
+<svg aria-hidden="true" style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <symbol id="icon-question" viewBox="0 0 32 32">
+            <path d="M14 22h4v4h-4zM22 8c1.105 0 2 0.895 2 2v6l-6 4h-4v-2l6-4v-2h-10v-4h12zM16 3c-3.472 0-6.737 1.352-9.192 3.808s-3.808 5.72-3.808 9.192c0 3.472 1.352 6.737 3.808 9.192s5.72 3.808 9.192 3.808c3.472 0 6.737-1.352 9.192-3.808s3.808-5.72 3.808-9.192c0-3.472-1.352-6.737-3.808-9.192s-5.72-3.808-9.192-3.808zM16 0v0c8.837 0 16 7.163 16 16s-7.163 16-16 16c-8.837 0-16-7.163-16-16s7.163-16 16-16z"></path>
+        </symbol>
+    </defs>
+</svg>
+
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" />
 <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
 <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
-<link href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" rel="stylesheet" />
+
 <script type="text/javascript">
 
     // Keep track if search was clicked.
@@ -147,19 +161,15 @@
         initializeDatepicker("UploadDateTo", "UploadDateFrom", "setEndDate");
 
         //
-        // Set up the select2 dropdowns
+        // Set up the channel choice radio buttons
         //
-        //$("#ChannelId").select2({
-        //    width: 'resolve',
-        //    minimumResultsForSearch: -1,
-        //    allowClear: true,
-        //    placeholder: "Select a channel"
-        //});
-
         $(".channel-choice").checkboxradio({
             icon: false
         });
 
+        //
+        // Set up the select2 dropdowns
+        //
         $("#CaptionTypeId").select2({
             width: 'resolve',
             minimumResultsForSearch: -1,
@@ -280,6 +290,9 @@
         tag.src = "https://www.youtube.com/iframe_api";
         var firstScriptTag = document.getElementsByTagName('script')[0];
         firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+        // Enable bootstrap tooltips
+        $('[data-toggle="tooltip"]').tooltip()
 
         // Final step - if any URL parameters were passed in,
         // then automatically start the search on page load.

@@ -7,6 +7,31 @@
     <h4 style="text-align:center">Frequently Asked Questions</h4>
     <div id="accordion">
         <div class="card">
+            <div class="card-header" id="headingZero">
+                <h5 class="mb-0">
+                    <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseZero" aria-expanded="false" aria-controls="collapseZero">
+                        What are the different search modes?
+                    </button>
+                </h5>
+            </div>
+            <div id="collapseZero" class="collapse" aria-labelledby="headingZero" data-parent="#accordion">
+                <div class="card-body">
+                    <b>Normal mode</b> uses a simplified method of searching. Whatever you search for is what it will look for, with some caveats.
+                    It will trim out punctuation and it will ignore capitalization.
+                    The order of the words matters too, so searching for "Did I mine that" will not find results for "I did mine that".
+                    The words you search for must come one after another in the caption, so searching for "one two three" will not find results for "one two and three".
+                    <br /><br />
+                    <b>Fuzzy mode </b> will try to be smart and ignore less useful words like "the", "and", "a", and so on.
+                    It will also find words with the same base, so searching for "jumping" will find results for "jump", "jumps", "jumping", "jumped", and so on.
+                    Fuzzy mode will ignore the position of the words, so searching for "big bean burrito" will be the same as searching for "bean big burrito"." +
+                    <br /><br />
+                    There's a secret third search mode. Wrap your search term in quotes to find exact matches. It ignores capitalization, but not punctuation.
+                    This can help if you remember part of a word or if the auto-generated caption doesn't spell it quite right.
+                    For example, if you want to find when Dunkey says "PELICAN!", but the caption spelled it as ""PEEEEEEEH-lican!", you can try searching for "lican".
+                </div>
+            </div>
+        </div>
+
             <div class="card-header" id="headingOne">
                 <h5 class="mb-0">
                     <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
@@ -17,7 +42,7 @@
             <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
                 <div class="card-body">
                     <ul>
-                        <li>Try using the advanced filters to narrow down the results</li>
+                        <li>Try using the optional filters to narrow down the results</li>
                         <li>Try searching for a key word or 2 instead of an entire quote. Sometimes different words have better results.</li>
                         <li>Try alternate spellings of words, since sometimes the auto-generated captions aren't quite right.</li>
                         <li>You can wrap your search in quotes "like this" to search for an exact text match. This ignores capitalization.</li>
@@ -34,7 +59,7 @@
             <div class="card-header" id="headingTwo">
                 <h5 class="mb-0">
                     <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
-                        How does the search work behind the scenes?
+                        How does the site work on a technical level?
                     </button>
                 </h5>
             </div>
@@ -61,11 +86,10 @@
             </div>
             <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
                 <div class="card-body">
-                    <ul>
-                        <li>Below is a list of videos that cannot be searched, with a reason explaining why. It is currently unknown if Dunkey or Leah will accept community-submitted captions for these videos.</li>
-                        <li>In addition, it may take time for recently uploaded videos to be added to the site. You can search for a video using the advanced filters to see if it has been added yet.</li>
-                        <li>Stream archives from Walter .NO are not currently supported, but will be added in the future if there is enough interest.</li>
-                    </ul>
+                    Below is a list of videos that cannot be searched, with a reason explaining why. It is currently unknown if Dunkey or Leah will accept community-submitted captions for these videos.
+                    <br/><br/>
+                    In addition, it may take time for recently uploaded videos to be added to the site. You can search for a video using the advanced filters to see if it has been added yet.
+                    <br/><br/>
                     <table id="unsupported-videos-table">
                         <tr>
                             <th>Channel</th>

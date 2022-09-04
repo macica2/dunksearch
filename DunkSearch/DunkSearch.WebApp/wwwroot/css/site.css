@@ -94,7 +94,7 @@ body {
     color: #212529 !important;
 }
 
-/* Date-picker active day and channel pickers */
+/* channel pickers */
 .ui-state-active,
 .ui-widget-content .ui-state-active,
 .ui-widget-header .ui-state-active,
@@ -103,6 +103,15 @@ a.ui-button:active,
 .ui-button.ui-state-active:hover {
     background-color: #dd6bc4 !important;
     border-color: #d342b3 !important;
+}
+
+/* Date-pickers */
+.active.day,
+.active.month, 
+.active.year,
+.active.decade,
+.active.century {
+    background-image: linear-gradient(to bottom,#dd6bc4,#d342b3) !important;
 }
 
 .ui-visual-focus {
@@ -123,10 +132,17 @@ a.ui-button:active,
     font-weight: bold;
 }
 
-@media (max-width: 1199px) {
+.channel-label {
+    width: 100%;
+}
+@media screen and (max-width: 992px) {
     .channel-label {
-        min-width: 44%;
+        font-size: 13px !important; /* this fixes issues with the videogamedunkey label getting cut off */
     }
+}
+
+.home-radio-btn {
+    accent-color: #dd6bc4;
 }
 
 .icon {
@@ -180,13 +196,22 @@ a.ui-button:active,
     padding: 0 3px 0 3px;
 }
 .video-title {
-    position: absolute;
-    top: 0;
-    left: 0;
-    background-color: #333333;
-    color: white;
-    max-width: 75%;
+    max-height: 4.4rem;
+    overflow: hidden;
+    -webkit-line-clamp: 1;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
+    white-space: normal;
+    padding: 3px;
     text-align: left;
+    font-size: 13px;
+    font-weight: 500;
+    background-color: #e797d5;
+}
+.video-caption {
+    padding: 5px;
+    font-weight: 500;
 }
 
 /* FAQ styles */
