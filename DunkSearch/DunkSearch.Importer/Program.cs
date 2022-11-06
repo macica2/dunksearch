@@ -19,9 +19,9 @@ namespace DunkSearch.Importer
             // Initialize config file and DB context
             var configuration = GetConfiguration();
             var dataContext = GetDataContext(configuration);
-            
+
             // Load channel and file paths based on config file
-            var channel = GetChannel(configuration, dataContext);
+            var channels = GetChannels(configuration, dataContext);
             var filePaths = GetFilePaths(configuration);
 
             // Load CaptionTypes up front for reuse
@@ -30,7 +30,7 @@ namespace DunkSearch.Importer
             // Loop through each input file
             foreach (var filePath in filePaths)
             {
-                ProcessFile(filePath, dataContext, captionTypes, channel);
+                ProcessFile(filePath, dataContext, captionTypes, channels);
             }
 
             // If anything fails, log it
@@ -78,22 +78,26 @@ namespace DunkSearch.Importer
         }
 
         /// <summary>
-        /// Gets the channel from the DB using the name.
+        /// Gets the channels from the DB, and optionally gets just one based on input file.
         /// If channel is not found, don't automatically create it, since
         /// this helps prevent typos/bad data. Assume admin creates channel manually.
         /// </summary>
         /// <returns></returns>
-        private static Channel GetChannel(IConfigurationRoot configuration, DataContext dataContext)
+        private static List<Channel> GetChannels(IConfigurationRoot configuration, DataContext dataContext)
         {
+            // by default, we load all channels. This assumes the channel name is provided in the video extract JSON file.
+            var channels = dataContext.Channels.ToList();
+
+            // If the app settings config file provided a ChannelName, then load that channel instead.
+            // This supports the legacy JSON files that don't include the channel name,
+            // in case we ever need to import those again.
             var channelName = configuration["ChannelName"];
-            // Load the channel ID from DB
-            var channel = dataContext.Channels.Where(p => p.Name == channelName).FirstOrDefault();
-            if (channel == null)
+            if (!string.IsNullOrEmpty(channelName))
             {
-                Console.WriteLine("Error: channel " + channelName + " not found.");
-                Console.ReadLine();
+                channels = channels.Where(p => p.Name == channelName).ToList();
             }
-            return channel;
+
+            return channels;
         }
 
         /// <summary>
@@ -123,7 +127,7 @@ namespace DunkSearch.Importer
         /// <param name="dataContext"></param>
         /// <param name="captionTypes"></param>
         /// <param name="channel"></param>
-        private static void ProcessFile(string filePath, DataContext dataContext, List<CaptionType> captionTypes, Channel channel)
+        private static void ProcessFile(string filePath, DataContext dataContext, List<CaptionType> captionTypes, List<Channel> channels)
         {
             Console.WriteLine("Processing file " + filePath);
             string jsonFileContent = File.ReadAllText(filePath);
@@ -135,6 +139,19 @@ namespace DunkSearch.Importer
             {
                 Console.WriteLine("Error: CaptionType for language " + videoExtract.CaptionLanguage + " not found.");
                 Console.ReadLine();
+            }
+
+            // Grab the channel based on the name in the JSON file.
+            // If no channel was specified, use the first channel in the passed in list, meaning
+            // we are using the one in the app settings file.
+            Channel channel = null;
+            if (!string.IsNullOrEmpty(videoExtract.Channel))
+            {
+                channel = channels.Where(p => p.Name == videoExtract.Channel).First();
+            }
+            else
+            {
+                channel = channels[0];
             }
 
             var video = GetVideo(dataContext, videoExtract, channel, captionTypeId);

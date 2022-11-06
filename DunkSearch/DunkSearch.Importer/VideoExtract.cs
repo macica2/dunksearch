@@ -7,6 +7,7 @@ namespace DunkSearch.Importer
     {
         public string Id { get; set; }
         public string Title { get; set; }
+        public string Channel { get; set; }
         public string UploadDate { get; set; }
         public string CaptionLanguage { get; set; }
         public List<VideoExtractCaption> Transcript { get; set; }

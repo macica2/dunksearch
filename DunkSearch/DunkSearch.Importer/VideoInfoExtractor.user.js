@@ -24,20 +24,13 @@
     {
         console.log('Page loaded');
         // opens the menu which includes the Show Transcripts button.
-        // If YouTube doesn't show the clip button, then the position changes
-        if (document.getElementById("info-contents").querySelectorAll("yt-icon-button").length >= 6)
-        {
-            document.getElementById("info-contents").querySelectorAll("yt-icon-button")[5].click();
-        }
-        else
-        {
-            document.getElementById("info-contents").querySelectorAll("yt-icon-button")[4].click();
-        }
+        document.getElementById("above-the-fold").querySelectorAll("#button-shape")[0].querySelectorAll("button")[0].click();
+
         // sleep for some time while we wait for the menu to show
         setTimeout(function ()
         {
             // clicks the Show transcript button
-            document.getElementsByClassName("style-scope ytd-menu-popup-renderer")[2].click();
+            document.getElementsByClassName("style-scope ytd-menu-popup-renderer")[3].click();
             // sleep again while we wait for the 2nd menu to show up
             setTimeout(function ()
             {
@@ -45,6 +38,7 @@
                 var timestamps = document.getElementsByClassName("segment-timestamp style-scope ytd-transcript-segment-renderer");
                 var captions = document.getElementsByClassName("segment-text style-scope ytd-transcript-segment-renderer");
                 var captionLanguageLabel = document.getElementById("label-text");
+                var channelName = document.getElementsByClassName("ytd-channel-name")[2].querySelector("a").innerHTML;
                 var captionLanguage;
                 if (captionLanguageLabel == null)
                 {
@@ -77,6 +71,7 @@
                 var jsonInfo = {
                     Id: vidId,
                     Title: vidTitle,
+                    Channel: channelName,
                     UploadDate: vidDate,
                     CaptionLanguage: captionLanguage,
                     Transcript: transcript

@@ -132,7 +132,7 @@ VALUES
 	(walter_no_channel_id, 'Sqxff7X1wqs', 'Dunkey Streams Minecraft Saturday', 'No captions available'),
 	(walter_no_channel_id, 'VQKszydV1SE', 'Dunkey Streams Reaction Friday', 'No captions available'),
 	(walter_no_channel_id, '-Gxp6-wYPBQ', 'Dunkey Streams Tekken 3', 'No captions available'),
-	(walter_no_channel_id, '8o1jh_jxwzQ', 'Dunkey Streams Hades and Super Mario Land', 'No captions available'), -- TODO
+	(walter_no_channel_id, '8o1jh_jxwzQ', 'Dunkey Streams Hades and Super Mario Land', 'No captions available'),
 	(walter_no_channel_id, 'PCRj_YyOBgc', 'Dunkey Streams Family Feud w/ Friends', 'No captions available'),
 	(walter_no_channel_id, 'zvb-PM9JOaE', 'Dunkey Streams Family Feud', 'No captions available'),
 	(walter_no_channel_id, 'dZWFYWG5Vqo', 'Dunkey Streams Tekken 7 & Jackbox Party Pack 7', 'No captions available'),
