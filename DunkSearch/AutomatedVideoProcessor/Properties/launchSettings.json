@@ -1,9 +1,9 @@
 {
   "profiles": {
-    "DunkSearch.Importer": {
+    "AutomatedVideoProcessor": {
       "commandName": "Project",
       "environmentVariables": {
-        "DOTNET_ENVIRONMENT": "Production"
+        "DOTNET_ENVIRONMENT": "Development"
       }
     }
   }

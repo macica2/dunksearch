@@ -1,10 +1,10 @@
 ﻿-- Create the Channel records --
-INSERT INTO channel(name, yt_channel_id)
+INSERT INTO channel(name, yt_channel_id, uploads_playlist_id)
 VALUES 
-	('videogamedunkey', 'UCsvn_Po0SmunchJYOWpOxMg'),
-	('WaLter .NO (coming soon)', 'UCbOPMX9iWXlulmbNXrz6oLw'),
-	('Dunk Tank (coming soon)', 'UCGiJeCKTVKIxtaYZOidh19g'),
-	('Leahbee (coming soon)', 'UCq7D2jqBfjse5M18CaLlTjA');
+	('videogamedunkey', 'UCsvn_Po0SmunchJYOWpOxMg', 'UUsvn_Po0SmunchJYOWpOxMg'),
+	('WaLter .NO', 'UCbOPMX9iWXlulmbNXrz6oLw', 'UUbOPMX9iWXlulmbNXrz6oLw'),
+	('Dunk Tank', 'UCGiJeCKTVKIxtaYZOidh19g', 'UUGiJeCKTVKIxtaYZOidh19g'),
+	('Leahbee', 'UCq7D2jqBfjse5M18CaLlTjA', 'UUq7D2jqBfjse5M18CaLlTjA');
 
 -- Create the CaptionType records --
 INSERT INTO caption_type(name)

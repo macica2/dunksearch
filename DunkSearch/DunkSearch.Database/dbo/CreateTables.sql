@@ -3,7 +3,8 @@ CREATE TABLE channel
 ( 
 	channel_id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
 	name TEXT NOT NULL,
-	yt_channel_id TEXT NOT NULL
+	yt_channel_id TEXT NOT NULL,
+	uploads_playlist_id TEXT NOT NULL
 );
 
 CREATE TABLE video

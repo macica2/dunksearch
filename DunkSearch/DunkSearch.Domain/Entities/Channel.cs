@@ -15,5 +15,8 @@ namespace DunkSearch.Domain.Entities
 
         [Column("yt_channel_id")]
         public string YTChannelId { get; set; }
+
+        [Column("uploads_playlist_id")]
+        public string UploadsPlaylistId { get; set; }
     }
 }
