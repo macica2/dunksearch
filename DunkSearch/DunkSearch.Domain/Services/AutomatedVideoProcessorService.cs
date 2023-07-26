@@ -43,19 +43,34 @@ namespace DunkSearch.Domain.Services
                 {
                     ProcessChannel(channel, request.YouTubeAPIKey);
                 }
+            }
+            catch (Exception ex)
+            {
+                // If processing failed, add exception to the email logs
+                _logs.Add(ex.Message + " | " + ex.StackTrace);
+            }
 
+            try
+            {
                 SendSummaryEmail(request.EmailFrom, request.EmailTo, request.SendGridAPIKey);
             }
             catch (Exception ex)
             {
+                // If email fails too, try logging to the database
                 _dataContext.Add(new AppEventLog()
                 {
                     CreateDate = DateTime.Now,
                     EventType = "Automated Video Processing Error",
                     EventDetails = ex.Message + " | " + ex.StackTrace
                 });
+                _dataContext.Add(new AppEventLog()
+                {
+                    CreateDate = DateTime.Now,
+                    EventType = "Automated Video Processing Error",
+                    EventDetails = string.Join(" ||| ", _logs) // arbitrary separator to make reading easier
+                });
+                _dataContext.SaveChanges();
             }
-            
         }
 
         private void ProcessChannel(Channel channel, string ytApiKey)
@@ -212,14 +227,21 @@ namespace DunkSearch.Domain.Services
             {
                 foreach (var cue in cueGroup.transcriptCueGroupRenderer.cues)
                 {
-                    var startSeconds = (Int32.Parse(cue.transcriptCueRenderer.startOffsetMs) / 1000);
-                    captionsToAdd.Add(new Caption()
+                    if (cue.transcriptCueRenderer.cue.simpleText != null)
                     {
-                        VideoId = videoId,
-                        CaptionTypeId = captionTypeId,
-                        StartSeconds = startSeconds,
-                        CaptionText = cue.transcriptCueRenderer.cue.simpleText
-                    });
+                        var startSeconds = (Int32.Parse(cue.transcriptCueRenderer.startOffsetMs) / 1000);
+                        captionsToAdd.Add(new Caption()
+                        {
+                            VideoId = videoId,
+                            CaptionTypeId = captionTypeId,
+                            StartSeconds = startSeconds,
+                            CaptionText = cue.transcriptCueRenderer.cue.simpleText
+                        });
+                    }
+                    else
+                    {
+                        _logs.Add($"<b>ERROR:</b> Caption text was blank at {cue.transcriptCueRenderer.startOffsetMs}ms. Skipping caption.");
+                    }
                 }
             }
 
@@ -243,6 +265,7 @@ namespace DunkSearch.Domain.Services
                 Reason = reason
             };
             _dataContext.Add(unsupportedVid);
+            _dataContext.SaveChanges();
         }
 
         /// <summary>

@@ -11,7 +11,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DunkSearch.Importer", "Dunk
 EndProject
 Project("{00D1A9C2-B5F0-4AF3-8072-F6C62B433612}") = "DunkSearch.Database", "DunkSearch.Database\DunkSearch.Database.sqlproj", "{1FA8FE53-0EAE-4D9D-B61A-9072AFA9A5C9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AutomatedVideoProcessor", "AutomatedVideoProcessor\AutomatedVideoProcessor.csproj", "{9B7C11AE-8656-470A-83D7-5C8AD82DBC7D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DunkSearch.AutomatedVideoProcessor", "DunkSearch.AutomatedVideoProcessor\DunkSearch.AutomatedVideoProcessor.csproj", "{9B7C11AE-8656-470A-83D7-5C8AD82DBC7D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
