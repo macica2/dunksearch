@@ -10,6 +10,7 @@ using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
+using Google.Protobuf;
 
 namespace DunkSearch.Domain.Services
 {
@@ -187,11 +188,20 @@ namespace DunkSearch.Domain.Services
             var url = "https://www.youtube.com/youtubei/v1/get_transcript?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"; // YT UI Key
             using (var request = new HttpRequestMessage(new HttpMethod("POST"), url))
             {
-                // get the video ID as a base64 encoded string, with a prefix
-                var plainTextBytes = System.Text.Encoding.UTF8.GetBytes("\n\x0b" + videoId);
-                var base64videoId = System.Convert.ToBase64String(plainTextBytes);
-
-                request.Content = new StringContent("{\"context\":{\"client\":{\"clientName\":\"WEB\",\"clientVersion\":\"2.2021111\"}},\"params\":\"" + base64videoId + "\"}");
+                // We must encode the video ID and the language of the captions we're trying to grab.
+                // It must be in a specific format or the request will fail.
+                var desiredLanguage = new Models.ProtoModels.DesiredLanguage()
+                {
+                    PrimaryLanguage = "asr",
+                    SecondaryLanguage = "en"
+                };
+                var captionRequest = new Models.ProtoModels.CaptionRequest()
+                {
+                    VideoId = videoId,
+                    DesiredLanguageStr = desiredLanguage.ToByteString().ToBase64() // You must encode the language here even though we encode the whole request after
+                };
+                var encodedParams = captionRequest.ToByteString().ToBase64();
+                request.Content = new StringContent("{\"context\":{\"client\":{\"clientName\":\"WEB\",\"clientVersion\":\"2.2021111\"}},\"params\":\"" + encodedParams + "\"}");
                 request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
 
                 var response = httpClient.SendAsync(request).Result;
@@ -223,24 +233,25 @@ namespace DunkSearch.Domain.Services
         {
             // add the caption records for each line in the input
             var captionsToAdd = new List<Caption>();
-            foreach (var cueGroup in getCaptionsResponse.actions[0].updateEngagementPanelAction.content.transcriptRenderer.body.transcriptBodyRenderer.cueGroups)
+            foreach (var initialSegment in getCaptionsResponse.actions[0].updateEngagementPanelAction?.content.transcriptRenderer.content.transcriptSearchPanelRenderer.body.transcriptSegmentListRenderer.initialSegments)
             {
-                foreach (var cue in cueGroup.transcriptCueGroupRenderer.cues)
+                // There can technically be multiple runs per snippet/segment, but in reality it's always 1
+                foreach (var run in initialSegment.transcriptSegmentRenderer.snippet.runs)
                 {
-                    if (cue.transcriptCueRenderer.cue.simpleText != null)
+                    if (run.text != null)
                     {
-                        var startSeconds = (Int32.Parse(cue.transcriptCueRenderer.startOffsetMs) / 1000);
+                        var startSeconds = (Int32.Parse(initialSegment.transcriptSegmentRenderer.startMs) / 1000);
                         captionsToAdd.Add(new Caption()
                         {
                             VideoId = videoId,
                             CaptionTypeId = captionTypeId,
                             StartSeconds = startSeconds,
-                            CaptionText = cue.transcriptCueRenderer.cue.simpleText
+                            CaptionText = run.text
                         });
                     }
                     else
                     {
-                        _logs.Add($"<b>ERROR:</b> Caption text was blank at {cue.transcriptCueRenderer.startOffsetMs}ms. Skipping caption.");
+                        _logs.Add($"<b>ERROR:</b> Caption text was blank at {initialSegment.transcriptSegmentRenderer.startMs}ms. Skipping caption.");
                     }
                 }
             }

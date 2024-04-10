@@ -1,0 +1,13 @@
+﻿syntax = "proto3";
+package dunksearch;
+option csharp_namespace = "DunkSearch.Domain.Models.ProtoModels";
+
+message CaptionRequest {
+	string videoId = 1;
+	string desiredLanguageStr = 2;
+}
+
+message DesiredLanguage {
+	string primaryLanguage = 1;
+	string secondaryLanguage = 2;
+}

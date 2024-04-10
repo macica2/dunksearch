@@ -22,7 +22,8 @@ namespace DunkSearch.Domain.Models.ServiceModels.AutomatedVideoProcessor
             get
             {
                 return actions[0].updateEngagementPanelAction.content.
-                    transcriptRenderer.footer.transcriptFooterRenderer.languageMenu.
+                    transcriptRenderer.content.transcriptSearchPanelRenderer.
+                    footer.transcriptFooterRenderer.languageMenu.
                     sortFilterSubMenuRenderer.subMenuItems.
                     Where(p => p.selected == true).Select(p => p.title).FirstOrDefault();
             }
@@ -37,9 +38,9 @@ namespace DunkSearch.Domain.Models.ServiceModels.AutomatedVideoProcessor
             {
                 return (actions == null ||
                     actions.Count == 0 ||
-                    actions[0].updateEngagementPanelAction?.content?.transcriptRenderer?.body?.transcriptBodyRenderer?.cueGroups == null ||
-                    actions[0].updateEngagementPanelAction?.content?.transcriptRenderer?.body?.transcriptBodyRenderer?.cueGroups.Count == 0 ||
-                    actions[0].updateEngagementPanelAction.targetId != "engagement-panel-transcript");
+                    actions[0].updateEngagementPanelAction?.content?.transcriptRenderer?.content?.transcriptSearchPanelRenderer?.body?.transcriptSegmentListRenderer?.initialSegments == null ||
+                    actions[0].updateEngagementPanelAction?.content?.transcriptRenderer?.content?.transcriptSearchPanelRenderer?.body?.transcriptSegmentListRenderer?.initialSegments.Count == 0 ||
+                    actions[0].updateEngagementPanelAction.targetId != "engagement-panel-searchable-transcript");
             }
         }
     }
@@ -49,7 +50,6 @@ namespace DunkSearch.Domain.Models.ServiceModels.AutomatedVideoProcessor
     /// </summary>
     public class Action
     {
-        public string clickTrackingParams { get; set; }
         public UpdateEngagementPanelAction updateEngagementPanelAction { get; set; }
     }
 
@@ -59,15 +59,7 @@ namespace DunkSearch.Domain.Models.ServiceModels.AutomatedVideoProcessor
     /// </summary>
     public class Body
     {
-        public TranscriptBodyRenderer transcriptBodyRenderer { get; set; }
-    }
-
-    /// <summary>
-    /// Represents a caption in the transcript
-    /// </summary>
-    public class Cue
-    {
-        public string simpleText { get; set; }
+        public TranscriptSegmentListRenderer transcriptSegmentListRenderer { get; set; }
     }
 
     /// <summary>
@@ -86,43 +78,68 @@ namespace DunkSearch.Domain.Models.ServiceModels.AutomatedVideoProcessor
     public class Content
     {
         public TranscriptRenderer transcriptRenderer { get; set; }
+
+        public TranscriptSearchPanelRenderer transcriptSearchPanelRenderer { get; set; }
+    }
+
+    /// <summary>
+    /// Parent object containing the entire transcript box in the UI
+    /// </summary>
+    public class TranscriptRenderer
+    {
+        public Content content { get; set; }
     }
 
     /// <summary>
     /// Represents the entire transcript box in the UI
     /// </summary>
-    public class TranscriptRenderer
+    public class TranscriptSearchPanelRenderer
     {
         public Body body { get; set; }
         public Footer footer { get; set; }
-        public string trackingParams { get; set; }
-    }
-    
-    /// <summary>
-    /// Represents one line in the transcript, including the caption and the times
-    /// </summary>
-    public class TranscriptCueRenderer
-    {
-        public Cue cue { get; set; }
-        public string startOffsetMs { get; set; }
-        public string durationMs { get; set; }
     }
 
     /// <summary>
-    /// Parent object to store list of cue groups
+    /// Represents the box that contains all the clickable lines of the transcript in the UI
     /// </summary>
-    public class TranscriptBodyRenderer
+    public class TranscriptSegmentListRenderer
     {
-        public List<CueGroup> cueGroups { get; set; }
+        public List<InitialSegment> initialSegments { get; set; }
     }
 
     /// <summary>
-    /// Simple parent object to hold multiple cues.
-    /// In reality it looks like only 1 cue is ever really in this list.
+    /// Represents a segment of the video which gets rendered with a caption and timestamp
     /// </summary>
-    public class TranscriptCueGroupRenderer
+    public class InitialSegment
     {
-        public List<CueListItem> cues { get; set; }
+        public TranscriptSegmentRenderer transcriptSegmentRenderer { get; set; }
+    }
+
+    /// <summary>
+    /// Represents one line in the transcript, including the caption and the time
+    /// </summary>
+    public class TranscriptSegmentRenderer
+    {
+        public string startMs { get; set; }
+
+        public CaptionSnippet snippet { get; set; }
+    }
+
+    /// <summary>
+    /// Simple parent object to hold multiple runs.
+    /// In reality it looks like only 1 run is ever really in this list.
+    /// </summary>
+    public class CaptionSnippet
+    {
+        public List<Run> runs { get; set; }
+    }
+
+    /// <summary>
+    /// Represents the text that is displayed for the caption
+    /// </summary>
+    public class Run
+    {
+        public string text { get; set; }
     }
 
     /// <summary>
@@ -131,22 +148,6 @@ namespace DunkSearch.Domain.Models.ServiceModels.AutomatedVideoProcessor
     public class TranscriptFooterRenderer
     {
         public LanguageMenu languageMenu { get; set; }
-    }
-
-    /// <summary>
-    /// Holds the renderer for a single caption
-    /// </summary>
-    public class CueListItem
-    {
-        public TranscriptCueRenderer transcriptCueRenderer { get; set; }
-    }
-    
-    /// <summary>
-    /// Simple parent object
-    /// </summary>
-    public class CueGroup
-    {
-        public TranscriptCueGroupRenderer transcriptCueGroupRenderer { get; set; }
     }
 
     /// <summary>
@@ -171,7 +172,6 @@ namespace DunkSearch.Domain.Models.ServiceModels.AutomatedVideoProcessor
     public class SortFilterSubMenuRenderer
     {
         public List<SubMenuItem> subMenuItems { get; set; }
-        public string trackingParams { get; set; }
     }
 
     /// <summary>
