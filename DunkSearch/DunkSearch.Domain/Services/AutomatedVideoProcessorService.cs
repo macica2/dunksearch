@@ -1,16 +1,13 @@
 ﻿using DunkSearch.Domain.Entities;
 using DunkSearch.Domain.Models.ServiceModels.AutomatedVideoProcessor;
-using SendGrid;
-using SendGrid.Helpers.Mail;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
-using System.Text;
 using System.Text.Json;
-using System.Threading.Tasks;
 using Google.Protobuf;
+using System.Net.Mail;
 
 namespace DunkSearch.Domain.Services
 {
@@ -53,7 +50,7 @@ namespace DunkSearch.Domain.Services
 
             try
             {
-                SendSummaryEmail(request.EmailFrom, request.EmailTo, request.SendGridAPIKey);
+                SendSummaryEmail(request.GmailAddress, request.SmtpAppPassword);
             }
             catch (Exception ex)
             {
@@ -280,37 +277,44 @@ namespace DunkSearch.Domain.Services
         }
 
         /// <summary>
-        /// Uses Twilio SendGrid to send an email summarizing this run.
+        /// Uses Gmail SMTP to send an email summarizing this run.
         /// </summary>
-        private void SendSummaryEmail(string emailFromAddress, string emailToAddress, string sendGridApiKey)
+        private void SendSummaryEmail(string gmailAddress, string smtpAppPassword)
         {
-            // Send email when done
-            var client = new SendGridClient(sendGridApiKey);
-
             var emailBody = string.Join("<br>", _logs);
 
-            var msg = new SendGridMessage()
+            try
             {
-                From = new EmailAddress(emailFromAddress, "DunkSearch Bot"),
-                Subject = "DunkSearch Finished Processing Videos",
-                HtmlContent = emailBody
-            };
-            msg.AddTo(new EmailAddress(emailToAddress, "Admin"));
-            var response = client.SendEmailAsync(msg).Result;
-
-            // A success status code means SendGrid received the email request and will process it.
-            // Errors can still occur when SendGrid tries to send the email. 
-            // If email is not received, use this URL to debug: https://app.sendgrid.com/email_activity 
-
-            // If somehow the email failed to send, create an app event log record
-            // with all the logs so someone can manually check what happened.
-            if (!response.IsSuccessStatusCode)
+                SmtpClient smtpClient = new SmtpClient()
+                {
+                    Credentials = new System.Net.NetworkCredential(gmailAddress, smtpAppPassword),
+                    Host = "smtp.gmail.com",
+                    Port = 587,
+                    DeliveryMethod = SmtpDeliveryMethod.Network,
+                    EnableSsl = true
+                };
+                
+                MailMessage mail = new MailMessage()
+                {
+                    From = new MailAddress(gmailAddress, "DunkSearch Bot"), // even if you set a different from address, it just uses the gmail address
+                    Subject = "DunkSearch Finished Processing Videos",
+                    Body = emailBody,
+                    IsBodyHtml = true,
+                    BodyEncoding = System.Text.Encoding.UTF8
+                };
+                mail.To.Add(new MailAddress(gmailAddress));
+                
+                smtpClient.Send(mail);
+            }
+            catch (Exception ex)
             {
+                // If somehow the email failed to send, create an app event log record
+                // with all the logs so someone can manually check what happened.
                 _dataContext.Add(new AppEventLog()
                 {
                     CreateDate = DateTime.Now,
                     EventType = "Automated Video Processing Error",
-                    EventDetails = emailBody + "<br>" + response.StatusCode
+                    EventDetails = emailBody + "<br>" + ex.Message + ". " + ex.StackTrace
                 });
             }
         }

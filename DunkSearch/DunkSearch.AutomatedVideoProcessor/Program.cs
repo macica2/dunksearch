@@ -28,10 +28,9 @@ namespace DunkSearch.AutomatedVideoProcessor
             var service = new AutomatedVideoProcessorService(dataContext);
             service.StartProcess(new AutomatedVideoProcessorRequest()
             {
-                EmailFrom = configuration["EmailFromAddress"].ToString(),
-                EmailTo = configuration["EmailToAddress"].ToString(),
+                GmailAddress = configuration["GmailAddress"].ToString(),
                 YouTubeAPIKey = configuration["YouTubeAPIKey"].ToString(),
-                SendGridAPIKey = configuration["SendGridAPIKey"].ToString()
+                SmtpAppPassword = configuration["SmtpAppPassword"].ToString()
             });            
         }
 
