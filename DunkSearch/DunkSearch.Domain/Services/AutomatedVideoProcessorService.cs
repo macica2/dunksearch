@@ -232,7 +232,11 @@ namespace DunkSearch.Domain.Services
             var captionsToAdd = new List<Caption>();
             foreach (var initialSegment in getCaptionsResponse.actions[0].updateEngagementPanelAction?.content.transcriptRenderer.content.transcriptSearchPanelRenderer.body.transcriptSegmentListRenderer.initialSegments)
             {
-                // There can technically be multiple runs per snippet/segment, but in reality it's always 1
+                // There can technically be multiple runs per snippet/segment, but in reality it's always 1 or null
+                if (initialSegment.transcriptSegmentRenderer.snippet.runs == null)
+                {
+                    continue;
+                }
                 foreach (var run in initialSegment.transcriptSegmentRenderer.snippet.runs)
                 {
                     if (run.text != null)
