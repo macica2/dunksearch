@@ -179,9 +179,9 @@ namespace DunkSearch.Domain.Services
         /// </summary>
         /// <param name="videoId"></param>
         /// <returns></returns>
-        private GetVideoCaptionsResponse GetCaptionsForVideo(String videoId)
+        private GetVideoCaptionsAndroidResponse GetCaptionsForVideo(String videoId)
         {
-            GetVideoCaptionsResponse getCaptionsResponse = new GetVideoCaptionsResponse();
+            GetVideoCaptionsAndroidResponse getCaptionsResponse = new GetVideoCaptionsAndroidResponse();
             var url = "https://www.youtube.com/youtubei/v1/get_transcript?key=AIzaSyAO_FJ2SlqU8Q4STEHLGCilw_Y9_11qcW8"; // YT UI Key
             using (var request = new HttpRequestMessage(new HttpMethod("POST"), url))
             {
@@ -198,14 +198,14 @@ namespace DunkSearch.Domain.Services
                     DesiredLanguageStr = desiredLanguage.ToByteString().ToBase64() // You must encode the language here even though we encode the whole request after
                 };
                 var encodedParams = captionRequest.ToByteString().ToBase64();
-                request.Content = new StringContent("{\"context\":{\"client\":{\"clientName\":\"WEB\",\"clientVersion\":\"2.2021111\"}},\"params\":\"" + encodedParams + "\"}");
+                request.Content = new StringContent("{\"context\":{\"client\":{\"clientName\":\"ANDROID\",\"clientVersion\":\"19.29.37\"}},\"params\":\"" + encodedParams + "\"}");
                 request.Content.Headers.ContentType = MediaTypeHeaderValue.Parse("application/json");
 
                 var response = httpClient.SendAsync(request).Result;
                 if (response.IsSuccessStatusCode)
                 {
                     var jsonString = response.Content.ReadAsStringAsync().Result;
-                    getCaptionsResponse = JsonSerializer.Deserialize<GetVideoCaptionsResponse>(jsonString);
+                    getCaptionsResponse = JsonSerializer.Deserialize<GetVideoCaptionsAndroidResponse>(jsonString);
                     getCaptionsResponse.IsSuccessful = true;
                 }
                 else
@@ -226,34 +226,26 @@ namespace DunkSearch.Domain.Services
         /// <param name="captionTypeId"></param>
         /// <param name="getCaptionsResponse"></param>
         /// <returns></returns>
-        private List<Caption> ParseCaptions(int videoId, int captionTypeId, GetVideoCaptionsResponse getCaptionsResponse)
+        private List<Caption> ParseCaptions(int videoId, int captionTypeId, GetVideoCaptionsAndroidResponse getCaptionsResponse)
         {
             // add the caption records for each line in the input
             var captionsToAdd = new List<Caption>();
-            foreach (var initialSegment in getCaptionsResponse.actions[0].updateEngagementPanelAction?.content.transcriptRenderer.content.transcriptSearchPanelRenderer.body.transcriptSegmentListRenderer.initialSegments)
+            foreach (var initialSegment in getCaptionsResponse.actions[0].elementsCommand?.transformEntityCommand?.arguments?.transformTranscriptSegmentListArguments?.overwrite?.initialSegments)
             {
-                // There can technically be multiple runs per snippet/segment, but in reality it's always 1 or null
-                if (initialSegment.transcriptSegmentRenderer.snippet.runs == null)
+                if (!String.IsNullOrEmpty(initialSegment?.transcriptSegmentRenderer?.snippet?.elementsAttributedString?.content))
                 {
-                    continue;
+                    var startSeconds = (Int32.Parse(initialSegment.transcriptSegmentRenderer.startMs) / 1000);
+                    captionsToAdd.Add(new Caption()
+                    {
+                        VideoId = videoId,
+                        CaptionTypeId = captionTypeId,
+                        StartSeconds = startSeconds,
+                        CaptionText = initialSegment.transcriptSegmentRenderer.snippet.elementsAttributedString.content
+                    });
                 }
-                foreach (var run in initialSegment.transcriptSegmentRenderer.snippet.runs)
+                else
                 {
-                    if (run.text != null)
-                    {
-                        var startSeconds = (Int32.Parse(initialSegment.transcriptSegmentRenderer.startMs) / 1000);
-                        captionsToAdd.Add(new Caption()
-                        {
-                            VideoId = videoId,
-                            CaptionTypeId = captionTypeId,
-                            StartSeconds = startSeconds,
-                            CaptionText = run.text
-                        });
-                    }
-                    else
-                    {
-                        _logs.Add($"<b>ERROR:</b> Caption text was blank at {initialSegment.transcriptSegmentRenderer.startMs}ms. Skipping caption.");
-                    }
+                    _logs.Add($"<b>ERROR:</b> Caption text was blank at {initialSegment?.transcriptSegmentRenderer?.startMs}ms. Skipping caption.");
                 }
             }
 
