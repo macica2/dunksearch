@@ -1,0 +1,514 @@
+﻿@model DunkSearch.Domain.Models.ViewModels.QuizViewModel
+@{
+    ViewData["Title"] = "Caption Quiz";
+}
+
+<style>
+    .rank-square {
+      animation-name: rankAnimation;
+      animation-duration: 0.15s;
+      animation-timing-function: linear;
+      animation-delay: 1s;
+      animation-fill-mode: backwards;
+    }
+
+    @@keyframes rankAnimation {
+        from {
+            opacity: 0.0;
+            transform: scale(3) rotate(20deg);
+        }
+        to {
+            opacity: 1.0;
+            transform: scale(1) rotate(0deg);
+        }
+    }
+
+    .nightmare-animated-text {
+        animation: nightmareFlash 1s step-end infinite;
+    }
+    @@keyframes nightmareFlash {
+        50% {
+            color: red;
+        }
+    }
+
+    #final-score-anim {
+        animation: finalScoreTextSplash;
+        animation-duration: 0.2s;
+        animation-timing-function: linear;
+    }
+    @@keyframes finalScoreTextSplash {
+        from {
+            transform: scale(3);
+            opacity: 0.0;
+        }
+        to {
+            transform: scale(1);
+            opacity: 1.0;
+        }
+    }
+</style>
+
+<div class="text-center">
+    <div id="initial-div">
+        <h1 class="display-4 page-title">Caption Quiz</h1>
+        <h4>Get a random set of captions and guess the video they're from!</h4>
+        @using (Html.BeginForm(null, null, FormMethod.Post, new { id = "QuizForm" }))
+        {
+            <div class="container">
+                <div class="card card-body">
+                    <h5><b>Choose Your Difficulty</b></h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="control-label">
+                                @Html.LabelFor(p => p.ChannelOptions, new { @class = "control-label" })
+                            </div>
+                            <div class="row">
+                                @for (int i = 0; i < Model.ChannelOptions.Count; i++)
+                                {
+                                    <div class="col-sm-6">
+                                        <label for="ChannelOptions[@i].Selected" class="channel-label">@Model.ChannelOptions[i].ChannelName</label>
+                                        @Html.CheckBoxFor(p => p.ChannelOptions[i].Selected, new { @class = "channel-choice", id = "ChannelOptions[" + i + "].Selected" })
+                                        @Html.HiddenFor(p => p.ChannelOptions[i].ChannelId)
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="control-label">
+                                @Html.LabelFor(p => p.IncludeLeagueVideos, new { @class = "control-label" })
+                                <i data-toggle="tooltip" data-placement="top" title="Select No to exclude videos starting with 'League of Legends : ' or 'LoL : '" style="margin-left:5px">
+                                    <svg class="icon icon-question"><use xlink:href="#icon-question"></use></svg>
+                                </i>
+                            </div>
+                            <div>
+                                <label>No </label>
+                                @Html.RadioButtonFor(p => p.IncludeLeagueVideos, false, new { @class = "home-radio-btn" })
+                                <label style="margin-left:10px">Yes </label>
+                                @Html.RadioButtonFor(p => p.IncludeLeagueVideos, true, new { @class = "home-radio-btn" })
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="control-label">
+                                @Html.LabelFor(p => p.NumVideosToShow, new { @class = "control-label" })
+                                <i data-toggle="tooltip" data-placement="top" title="The number of answers to choose from. More answers = harder difficulty." style="margin-left:5px">
+                                    <svg class="icon icon-question"><use xlink:href="#icon-question"></use></svg>
+                                </i>
+                            </div>
+                            <div class="form-group">
+                                <select id="NumVideosToShow" name="NumVideosToShow" class="form-control" style="width:100%;" asp-for="@Model.NumVideosToShow">
+                                    @foreach (var numVideosOption in Model.NumVideosOptions)
+                                    {
+                                        <option value="@numVideosOption.id">@numVideosOption.text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="control-label">
+                                @Html.LabelFor(p => p.NumCaptionsToShow, new { @class = "control-label" })
+                                <i data-toggle="tooltip" data-placement="top" title="The more captions shown, the easier it will be to know the video context." style="margin-left:5px">
+                                    <svg class="icon icon-question"><use xlink:href="#icon-question"></use></svg>
+                                </i>
+                            </div>
+                            <div class="form-group">
+                                <select id="NumCaptionsToShow" name="NumCaptionsToShow" class="form-control" style="width:100%;" asp-for="@Model.NumCaptionsToShow">
+                                    @foreach (var numCaptionsOption in Model.NumCaptionsOptions)
+                                    {
+                                        <option value="@numCaptionsOption.id">@numCaptionsOption.text</option>
+                                    }
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="control-label">
+                                <label class="control-label">Number of Questions</label>
+                                <i data-toggle="tooltip" data-placement="top" title="In Endless mode, aim for a high streak. In other modes, aim for a high rank at the end." style="margin-left:5px">
+                                    <svg class="icon icon-question"><use xlink:href="#icon-question"></use></svg>
+                                </i>
+                            </div>
+                            <div class="form-group">
+                                <select id="NumQuestions" name="NumQuestions" class="form-control" style="width:100%;">
+                                    <option value="5" selected>5</option>
+                                    <option value="10" selected>10</option>
+                                    <option value="20">20</option>
+                                    <option value="50">50</option>
+                                    <option value="100">100</option>
+                                    <option value="Endless">Endless</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row justify-content-center">
+                        <h5 style="display:none" class="nightmare-text nightmare-animated-text"><b>!!! NIGHTMARE MODE ENABLED !!!</b></h5>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-4"></div>
+                    <div class="col-md-4">
+                        <button class="btn btn-primary" id="start-btn" type="submit">Start Quiz!</button>
+                        <div class="loading-msg" style="display:none">Loading...</div>
+                    </div>
+                    <div class="col-md-4"></div>
+                </div>
+            </div>
+        }
+    </div>
+
+    <div id="score-div" style="display:none;text-align:left" class="container-fluid">
+        <div class="row">
+            <div class="score-card">
+                <div class="nightmare-text" style="display:none"><b>NIGHTMARE MODE</b></div>
+                <div id="endless-score">
+                    <div><b>Best Streak:</b> <span id="best-streak">0</span></div>
+                    <div><b>Current Streak:</b> <span id="cur-streak">0</span></div>
+                </div>
+                <div id="normal-score">
+                    <div><b>Questions Answered:</b> <span id="questions-answered">0/0</span></div>
+                </div>
+            </div>
+            <div class="col">
+                <button type="button" class="btn btn-secondary" style="float:right" onclick="resetQuiz()">
+                    Start New Quiz
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div id="QuestionResultsPartial"></div>
+
+    <div id="final-score-container" class="container" style="display:none">
+        <button class="btn btn-primary" id="show-final-results-btn" onclick="showFinalResults()">Reveal Final Results</button>
+        <div id="final-score-div" style="display:none">
+            <div id="final-score-anim" style="font-size:32px">Final Score: <span id="final-score"></span></div>
+            <div class="row justify-content-center">
+                <div style="border: 2px solid black;width: 170px;height: 140px;background: black;border-radius: 5px;" class="rank-square">
+                    <div id="rank-inner-box" style="background: #EE00CD;height: 100%;border: 5px solid white;border-radius: 10px;color: white;">
+                        <div style="font-size: 50px;letter-spacing: 4px;margin-top: -14px;font-weight: bold;">RANK</div>
+                        <div id="rank" style="font-size: 100px;font-weight: bold;margin-top: -55px;">A</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="youtubeVideoModal" tabindex="-1" role="dialog" aria-labelledby="youtubeVideoModalTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width:fit-content">
+        <div class="modal-content">
+            <div class="modal-body" id="youtube-modal-body">
+                <div id="youtube-player"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SVG for the question mark icon, from icomoon.io -->
+<svg aria-hidden="true" style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <defs>
+        <symbol id="icon-question" viewBox="0 0 32 32">
+            <path d="M14 22h4v4h-4zM22 8c1.105 0 2 0.895 2 2v6l-6 4h-4v-2l6-4v-2h-10v-4h12zM16 3c-3.472 0-6.737 1.352-9.192 3.808s-3.808 5.72-3.808 9.192c0 3.472 1.352 6.737 3.808 9.192s5.72 3.808 9.192 3.808c3.472 0 6.737-1.352 9.192-3.808s3.808-5.72 3.808-9.192c0-3.472-1.352-6.737-3.808-9.192s-5.72-3.808-9.192-3.808zM16 0v0c8.837 0 16 7.163 16 16s-7.163 16-16 16c-8.837 0-16-7.163-16-16s7.163-16 16-16z"></path>
+        </symbol>
+    </defs>
+</svg>
+
+<link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+<script type="text/javascript">
+
+    var totalVideoCount = 0; // keep track of total videos for faster results
+    var currentScore = 0;
+    var bestStreak = 0;
+    var currentStreak = 0;
+    var questionsAnswered = 0;
+    var numQuestions = 0;
+    var questionWasAnswered = false;
+
+    $(document).ready(function ()
+    {
+        //
+        // Set up the channel choice radio buttons
+        //
+        $(".channel-choice").checkboxradio({
+            icon: false
+        });
+
+        //
+        // Set up the select2 dropdowns
+        //
+        $("#NumCaptionsToShow").select2({
+            width: 'resolve',
+            minimumResultsForSearch: -1,
+            allowClear: false,
+            placeholder: "Select an option"
+        });
+        $("#NumVideosToShow").select2({
+            width: 'resolve',
+            minimumResultsForSearch: -1,
+            allowClear: false,
+            placeholder: "Select an option"
+        });
+        $("#NumQuestions").select2({
+            width: 'resolve',
+            minimumResultsForSearch: -1,
+            allowClear: false,
+            placeholder: "Select an option"
+        });
+
+        // Enable bootstrap tooltips
+        $('[data-toggle="tooltip"]').tooltip()
+
+        $('#QuizForm').on('submit', function (e)
+        {
+            e.preventDefault();
+            if (!validateChannelSelected())
+            {
+                alert("You must select at least one channel.");
+                return;
+            }
+            $("#start-btn").hide();
+            $(".loading-msg").show();
+            var submitData = $(this).serialize();
+            $.post('/Quiz/GetVideoCount', submitData, function (results)
+            {
+                totalVideoCount = results;
+                submitData += "&TotalVideoCount=" + totalVideoCount;
+                $.post('/Quiz/GetQuizQuestion', submitData, function (questionResults)
+                {
+                    $("#initial-div").hide();
+                    if ($("#NumQuestions").val() == "Endless")
+                    {
+                        $("#endless-score").show();
+                        $("#normal-score").hide();
+                        numQuestions = 0;
+                    }
+                    else
+                    {
+                        numQuestions = parseInt($("#NumQuestions").val());
+                        $("#endless-score").hide();
+                        $("#questions-answered").html(questionsAnswered + "/" + numQuestions);
+                        $("#normal-score").show();
+                    }
+                    $("#score-div").show();
+                    $(".loading-msg").hide();
+                    $('#QuestionResultsPartial').html(questionResults);
+                });
+            });
+        });
+
+        $('#youtubeVideoModal').on('hidden.bs.modal', function (e)
+        {
+            // when user closes modal, unload the modal contents to stop the video
+            // and prepare it for the next video
+            $("#youtube-modal-body").html("<div id='youtube-player'></div>");
+        });
+
+        $("input").change(checkForNightmareDifficulty);
+        $("select").change(checkForNightmareDifficulty);
+
+        //
+        // Register the YouTube IFrame player asynchronously
+        //
+        var tag = document.createElement('script');
+        tag.src = "https://www.youtube.com/iframe_api";
+        var firstScriptTag = document.getElementsByTagName('script')[0];
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+    });
+
+    function answerQuestion(correctGuess)
+    {
+        if (questionWasAnswered)
+        {
+            return; // prevent duplicate submissions
+        }
+        questionWasAnswered = true;
+        $(".incorrect-video").css("filter", "opacity(0.5)");
+        //$(".incorrect-video").css("transform", "scale(0.9)");
+        $("#play-clip-btn").show();
+        $("#pass-btn").hide();
+        $("#videos-row").show();
+        if (correctGuess == "True")
+        {
+            currentStreak += 1;
+            currentScore += 1;
+            if (currentStreak > bestStreak)
+            {
+                bestStreak = currentStreak;
+            }
+        }
+        else
+        {
+            currentStreak = 0;
+        }
+        questionsAnswered += 1;
+        var scorePercentage = (currentScore / questionsAnswered * 100).toFixed(1) + "%";
+        //$("#cur-score").html(currentScore + "/" + questionsAnswered + " (" + scorePercentage + ")");
+        $("#cur-streak").html(currentStreak);
+        $("#best-streak").html(bestStreak);
+        $("#questions-answered").html(questionsAnswered + "/" + numQuestions);
+        if (numQuestions == 0 || (numQuestions != questionsAnswered))
+        {
+            // if endless mode or we didn't answer all questions, show next button
+            $("#next-question-btn").show();
+        }
+        else
+        {
+            // all questions were answered, so show the player's score
+            $("#final-score").html(currentScore + "/" + questionsAnswered + " (" + scorePercentage + ")");
+            $("#final-score-container").show();
+        }   
+    }
+
+    function loadNextQuestion()
+    {
+        $("#next-question-btn").hide();
+        if (questionsAnswered % 100 == 0)
+        {
+            alert("Why not take a break? You can pause the game by walking away.")
+        }
+        questionWasAnswered = false;
+        $("#QuizForm").submit();
+    }
+
+    // TODO should probably make this a reusable function, same as on home page
+    function showYouTubePlayer(videoId, startSeconds)
+    {
+        //console.log('starting showYouTubePlayer');
+        $("#youtube-player").html(null);
+        var defaultPlayerWidth = 640;
+        // if not enough room for default width, use dynamic width based on screen size.
+        var playerWidth = Math.min(window.innerWidth - 50, defaultPlayerWidth);
+        var playerHeight = (playerWidth * 9) / 16; // ensures player is in 16:9 format
+        var player = new YT.Player('youtube-player', {
+            width: playerWidth,
+            height: playerHeight,
+            videoId: videoId,
+            playerVars: {
+                playsinline: 1,
+                start: startSeconds,
+                enablejsapi: 1,
+                autoplay: 1,
+            },
+            events: {
+                //< !-- 'onReady': onPlayerReady, -- >
+                //< !-- 'onStateChange': onPlayerStateChange-- >
+            }
+        });
+
+        $('#youtubeVideoModal').modal('show')
+    }
+
+    function resetQuiz()
+    {
+        totalVideoCount = 0;
+        currentScore = 0;
+        currentStreak = 0;
+        bestStreak = 0;
+        questionsAnswered = 0;
+        questionWasAnswered = false;
+        //$("#cur-score").html("0");
+        $("#cur-streak").html("0");
+        $("#best-streak").html("0");
+        $('#QuestionResultsPartial').html("");
+        $("#score-div").hide();
+        $("#final-score-container").hide();
+        $("#final-score-div").hide();
+        $("#show-final-results-btn").show();
+        $(".loading-msg").hide();
+        $("#start-btn").show();
+        $("#initial-div").show();
+    }
+
+    function checkForNightmareDifficulty()
+    {
+        var isNightmareDifficultySelected = true;
+        if (
+            $("#NumVideosToShow").val() != "0" ||
+            $("#NumCaptionsToShow").val() != "1" ||
+            $('input[name="IncludeLeagueVideos"]:checked').val() != "True" ||
+            $('input[name="ChannelOptions[0].Selected"]:checked').val() != "true" ||
+            $('input[name="ChannelOptions[1].Selected"]:checked').val() != "true" ||
+            $('input[name="ChannelOptions[2].Selected"]:checked').val() != "true" ||
+            $('input[name="ChannelOptions[3].Selected"]:checked').val() != "true"
+        )
+        {
+            isNightmareDifficultySelected = false;
+        }
+
+        toggleNightmareDifficulty(isNightmareDifficultySelected)
+    }
+
+    function toggleNightmareDifficulty(toggleOn)
+    {
+        if (toggleOn)
+        {
+            $(".nightmare-text").show();
+        }
+        else
+        {
+            $(".nightmare-text").hide();
+        }
+    }
+
+    function validateChannelSelected()
+    {
+        return $('input[name="ChannelOptions[0].Selected"]:checked').val() == "true" ||
+            $('input[name="ChannelOptions[1].Selected"]:checked').val() == "true" ||
+            $('input[name="ChannelOptions[2].Selected"]:checked').val() == "true" ||
+            $('input[name="ChannelOptions[3].Selected"]:checked').val() == "true";
+    }
+
+    function showFinalResults()
+    {
+        updateRank();
+        $('#QuestionResultsPartial').html("");
+        $("#show-final-results-btn").hide();
+        $("#final-score-div").show();
+    }
+
+    function updateRank()
+    {
+        var percentage = parseFloat((currentScore / questionsAnswered * 100).toFixed(1));
+        var bgColor = "";
+        var rankText = ""
+        if (percentage >= 99)
+        {
+            bgColor = "#9F1EEE";
+            rankText = "S";
+        }
+        else if (percentage >= 90)
+        {
+            bgColor = "#EE00CD";
+            rankText = "A";
+        }
+        else if (percentage >= 80)
+        {
+            bgColor = "#FF0000";
+            rankText = "B";
+        }
+        else if (percentage >= 70)
+        {
+            bgColor = "#FFBD00";
+            rankText = "C";
+        }
+        else if (percentage >= 60)
+        {
+            bgColor = "#31DE00";
+            rankText = "D";
+        }
+        else
+        {
+            bgColor = "#4162DE";
+            rankText = "E";
+        }
+
+        $("#rank-inner-box").css("background-color", bgColor);
+        $("#rank").html(rankText);
+    }
+</script>

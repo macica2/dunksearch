@@ -223,3 +223,17 @@ a.ui-button:active,
 #unsupported-videos-table tr:nth-child(even) {
     background-color: whitesmoke;
 }
+
+/* Quiz Styles */
+#start-btn {
+    margin-top: 10px;
+    width: 100%;
+}
+.score-card {
+    border: 1px solid #212529;
+    border-radius: 5px;
+    padding: 15px;
+    margin-left: 15px;
+    background-color: #e797d5;
+    color: #212529;
+}

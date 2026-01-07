@@ -2,6 +2,7 @@
 using DunkSearch.Domain.Models.ServiceModels.Caption;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace DunkSearch.Domain.Services
@@ -100,6 +101,16 @@ namespace DunkSearch.Domain.Services
                                 .ToList();
             response.IsSuccessful = true;
             return response;
+        }
+
+        public List<Entities.Caption> GetRandomCaptions(int videoId, int captionsToRetrieve)
+        {
+            var query = _dataContext.Captions.AsQueryable();
+            query = query.Where(p => p.VideoId == videoId);
+            var count = query.Count();
+            Random rand = new Random();
+            var skip = rand.Next(0, Math.Max(0, count - captionsToRetrieve));
+            return query.OrderBy(p => p.StartSeconds).Skip(skip).Take(captionsToRetrieve).ToList();
         }
     }
 }

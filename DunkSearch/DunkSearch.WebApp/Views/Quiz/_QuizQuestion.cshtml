@@ -1,0 +1,92 @@
+﻿@model DunkSearch.Domain.Models.ViewModels.QuizQuestionViewModel
+@{
+}
+<div class="container-fluid question-container">
+    <div class="row" style="margin-bottom:10px">
+        <div class="col-md-12">
+            <div style="font-weight:bold;text-decoration:underline">Which video is this from?</div>
+            @foreach (var caption in Model.Captions)
+            {
+                <div>@caption</div>
+            }
+        </div>
+        <div class="col-md-4"></div>
+    </div>
+    @{ 
+        if (Model.Videos.Count() == 1) // indicates nightmare mode
+        {
+            <div class="row justify-content-center">
+                <div class="col-md-2">
+                    <div class="form-group">
+                        <select id="video-picker" name="video-picker" class="form-control" style="width:100%;">
+                        </select>
+                    </div>
+                    <button id="pass-btn" class="btn btn-secondary" type="button" onclick="answerQuestion('False')">Pass</button>
+                </div>
+            </div>
+        }
+    }
+    <div class="row justify-content-center" id="videos-row" style="@(Model.Videos.Count() == 1 ? "display:none" : "")">
+        @*<div class="col-xl-2"></div>*@
+        @foreach (var video in Model.Videos)
+        {
+            <div class="col-6 col-sm-6 col-md-4 col-lg-3 col-xl-2 search-result-col">
+                <div class="search-result-col-inner @(video.VideoId != Model.CorrectVideo.VideoId ? "incorrect-video" : "")" style="height: auto !important" onclick="@("answerQuestion('" + (video.VideoId == Model.CorrectVideo.VideoId) + "')")">
+                    <div class="video-thumbnail-container">
+                        <img class="video-thumbnail" src="@("https://img.youtube.com/vi/" + video.YTVideoId  + "/mqdefault.jpg")" />
+                    </div>
+                    <div>
+                        <div class="video-title" title="@video.Title">@video.Title</div>
+                    </div>
+                </div>
+                @if (video.VideoId == Model.CorrectVideo.VideoId)
+                {
+                    <div id="correct-text" style="display:none">Correct Video</div>
+                    <button id="play-clip-btn" style="display:none;margin-top:5px" class="btn btn-secondary" onclick="showYouTubePlayer('@video.YTVideoId', @Model.CaptionStartSeconds)">
+                        Play Clip
+                    </button>
+                }
+            </div>
+        }
+    </div>
+    <div class="row">
+        <div class="col-md-4"></div>
+        <div class="col-md-4">
+            <button class="btn btn-primary" id="next-question-btn" style="display:none" onclick="loadNextQuestion()">Next Question</button>
+            <div class="loading-msg" style="display:none">Loading...</div>
+        </div>
+        <div class="col-md-4"></div>
+    </div>
+</div>
+
+<script type="text/javascript">
+    $(document).ready(function ()
+    {
+        $("#video-picker").select2({
+            ajax: {
+                url: '/Video/GetSelectItems',
+                data: function (params)
+                {
+                    var query = {
+                        searchTerm: params.term
+                    }
+
+                    // Query parameters will be ?searchTerm=[term]
+                    return query;
+                }
+            },
+            width: 'resolve',
+            minimumInputLength: 3,
+            allowClear: true,
+            placeholder: "Type a video title"
+        });
+
+        $("#video-picker").change(function ()
+        {
+            var selectedVid = $("#video-picker").val();
+            var actualVid = @Model.CorrectVideo.VideoId;
+            var answer = (selectedVid == actualVid) ? "True" : "False";
+            answerQuestion(answer);
+        });
+    });
+</script>
