@@ -23,74 +23,61 @@
     setTimeout(function ()
     {
         console.log('Page loaded');
-        // opens the menu which includes the Show Transcripts button.
-        document.getElementById("above-the-fold").querySelectorAll("#button-shape")[0].querySelectorAll("button")[0].click();
+        // Clicks the Show Transcript button. Note we don't need to expand the video's description to see this button first.
+        document.querySelectorAll("ytd-video-description-transcript-section-renderer")[0].querySelectorAll("button")[0].click();
 
-        // sleep for some time while we wait for the menu to show
+        // sleep for some time while we wait for the transcript panel to render
         setTimeout(function ()
         {
-            // clicks the Show transcript button
-            document.getElementsByClassName("style-scope ytd-menu-popup-renderer")[3].click();
-            // sleep again while we wait for the 2nd menu to show up
-            setTimeout(function ()
+            // Now that the transcript is showing, we can get the timestamps
+            var timestamps = document.getElementsByClassName("ytwTranscriptSegmentViewModelTimestamp");
+            var captions = document.querySelectorAll(".ytwTranscriptSegmentViewModelHost .yt-core-attributed-string.yt-core-attributed-string--link-inherit-color");
+            // the caption language is no longer shown in the HTML, only if you click the gear in the video itself and select the subtitle
+            // so we will just always assume auto-generated captions and can manually adjust the JSON output if this isn't the language.
+            var captionLanguage = "English (auto-generated)";
+            var channelName = document.getElementsByClassName("ytd-channel-name")[2].querySelector("a").innerHTML;
+
+            // Grab other general information about the video
+            var vidId = window.location.href.split("?v=")[1].split("&")[0];
+            var vidTitle = document.getElementsByClassName("title style-scope ytd-video-primary-info-renderer")[0].innerText;
+            var vidDate = document.getElementById("info-strings").children[1].innerText.replace("Premiered ", "");
+
+            //var captionsOutput = "";
+            var transcript = [];
+            for (var i = 0; i < captions.length; i++)
             {
-                // Now that the transcript is showing, we can get the timestamps if transcript is showing
-                var timestamps = document.getElementsByClassName("segment-timestamp style-scope ytd-transcript-segment-renderer");
-                var captions = document.getElementsByClassName("segment-text style-scope ytd-transcript-segment-renderer");
-                var captionLanguageLabel = document.getElementById("label-text");
-                var channelName = document.getElementsByClassName("ytd-channel-name")[2].querySelector("a").innerHTML;
-                var captionLanguage;
-                if (captionLanguageLabel == null)
-                {
-                    captionLanguage = "English (auto-generated)";
-                }
-                else
-                {
-                    captionLanguage = captionLanguageLabel.innerText;
-                }
+                var curTimestamp = timestamps[i].innerText;
+                var curCaption = captions[i].innerText;
+                transcript.push({ 'Timestamp': curTimestamp, 'Caption': curCaption });
+                //captionsOutput += curTimestamp + "\n" + curCaption;
+                //if (i != (captions.length - 1))
+                //{
+                //    // if this isn't the last caption, add a new line to separate this caption from the next timestamp
+                //    captionsOutput += "\n";
+                //}
+            }
+            var jsonInfo = {
+                Id: vidId,
+                Title: vidTitle,
+                Channel: channelName,
+                UploadDate: vidDate,
+                CaptionLanguage: captionLanguage,
+                Transcript: transcript
+                //Transcript: captionsOutput
+            };
+            var jsonStr = JSON.stringify(jsonInfo, null, 2);
+            console.log(jsonStr);
 
-                // Grab other general information about the video
-                var vidId = window.location.href.split("?v=")[1].split("&")[0];
-                var vidTitle = document.getElementsByClassName("title style-scope ytd-video-primary-info-renderer")[0].innerText;
-                var vidDate = document.getElementById("info-strings").children[1].innerText.replace("Priemered ", "");
-
-                //var captionsOutput = "";
-                var transcript = [];
-                for (var i = 0; i < captions.length; i++)
-                {
-                    var curTimestamp = timestamps[i].innerText;
-                    var curCaption = captions[i].innerText;
-                    transcript.push({ 'Timestamp': curTimestamp, 'Caption': curCaption });
-                    //captionsOutput += curTimestamp + "\n" + curCaption;
-                    //if (i != (captions.length - 1))
-                    //{
-                    //    // if this isn't the last caption, add a new line to separate this caption from the next timestamp
-                    //    captionsOutput += "\n";
-                    //}
-                }
-                var jsonInfo = {
-                    Id: vidId,
-                    Title: vidTitle,
-                    Channel: channelName,
-                    UploadDate: vidDate,
-                    CaptionLanguage: captionLanguage,
-                    Transcript: transcript
-                    //Transcript: captionsOutput
-                };
-                var jsonStr = JSON.stringify(jsonInfo, null, 2);
-                console.log(jsonStr);
-
-                // Download the file
-                var fileName = vidTitle.replace(':', '_') // remove invalid file name characters
-                    .replace('/', '_').replace('\\', '_').replace('*', '_')
-                    .replace('?', '_').replace('|', '_').replace('>', '_')
-                    .replace('<', '_').replace('"', '_');
-                var a = document.createElement("a");
-                var file = new Blob([jsonStr], { type: 'txt/json' });
-                a.href = URL.createObjectURL(file);
-                a.download = fileName + '.json';
-                a.click();
-            }, 2000);
-        }, 1000);
+            // Download the file
+            var fileName = vidTitle.replace(':', '_') // remove invalid file name characters
+                .replace('/', '_').replace('\\', '_').replace('*', '_')
+                .replace('?', '_').replace('|', '_').replace('>', '_')
+                .replace('<', '_').replace('"', '_');
+            var a = document.createElement("a");
+            var file = new Blob([jsonStr], { type: 'txt/json' });
+            a.href = URL.createObjectURL(file);
+            a.download = fileName + '.json';
+            a.click();
+        }, 3000);
     }, 3000);
 })();
