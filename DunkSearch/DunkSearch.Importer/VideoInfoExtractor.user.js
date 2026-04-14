@@ -31,7 +31,7 @@
         {
             // Now that the transcript is showing, we can get the timestamps
             var timestamps = document.getElementsByClassName("ytwTranscriptSegmentViewModelTimestamp");
-            var captions = document.querySelectorAll(".ytwTranscriptSegmentViewModelHost .yt-core-attributed-string.yt-core-attributed-string--link-inherit-color");
+            var captions = document.querySelectorAll(".ytwTranscriptSegmentViewModelHost .ytAttributedStringHost.ytAttributedStringLinkInheritColor");
             // the caption language is no longer shown in the HTML, only if you click the gear in the video itself and select the subtitle
             // so we will just always assume auto-generated captions and can manually adjust the JSON output if this isn't the language.
             var captionLanguage = "English (auto-generated)";
