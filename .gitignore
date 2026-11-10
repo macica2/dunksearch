@@ -355,3 +355,5 @@ MigrationBackup/
 /DunkSearch/DunkSearch.WebApp/.config/dotnet-tools.json
 /DunkSearch/DunkSearch.AutomatedVideoProcessor/appsettings.Development.json
 /DunkSearch/DunkSearch.AutomatedVideoProcessor/appsettings.json
+/DunkSearch/DunkSearch.Migrator/appsettings.Development.json
+/DunkSearch/DunkSearch.Migrator/appsettings.json

@@ -1,0 +1,253 @@
+﻿/* Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
+for details on configuring this project to bundle and minify static web assets. */
+
+a.navbar-brand {
+    white-space: normal;
+    text-align: center;
+    word-break: break-all;
+}
+
+/* Provide sufficient contrast against white background */
+a {
+    color: #0366d6;
+}
+
+.nav-pills .nav-link.active, .nav-pills .show > .nav-link {
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+    font-size: 14px;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+.border-top {
+    border-top: 1px solid #e5e5e5;
+}
+
+.border-bottom {
+    border-bottom: 1px solid #e5e5e5;
+}
+
+.box-shadow {
+    box-shadow: 0 .25rem .75rem rgba(0, 0, 0, .05);
+}
+
+button.accept-policy {
+    font-size: 1rem;
+    line-height: inherit;
+}
+
+/* Sticky footer styles
+-------------------------------------------------- */
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+    /* Margin bottom by footer height */
+    margin-bottom: 60px;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    white-space: nowrap;
+    line-height: 60px; /* Vertically center the text there */
+}
+
+/* General override styles */
+.btn-primary {
+    color: #fff;
+    background-color: #dd6bc4;
+    border-color: #d342b3;
+}
+
+    .btn-primary:hover {
+        background-color: #e797d5;
+        border-color: #d342b3;
+    }
+
+    .btn-primary:not(:disabled):not(.disabled):active,
+    .btn-primary:not(:disabled):not(.disabled):focus,
+    .btn-primary:not(:disabled):not(.disabled):active:focus {
+        box-shadow: 0 0 0 0.2rem rgb(211 66 179 / 50%);
+        background-color: #e797d5;
+        border-color: #d342b3;
+    }
+
+.form-control:focus {
+    border-color: #d342b3;
+    box-shadow: 0 0 0 0.2rem rgb(211 66 179 / 50%);
+}
+
+.select2-container--default .select2-results__option--highlighted.select2-results__option--selectable {
+    background-color: #e797d5 !important;
+    color: #212529 !important;
+}
+
+/* channel pickers */
+.ui-state-active,
+.ui-widget-content .ui-state-active,
+.ui-widget-header .ui-state-active,
+a.ui-button:active,
+.ui-button:active,
+.ui-button.ui-state-active:hover {
+    background-color: #dd6bc4 !important;
+    border-color: #d342b3 !important;
+}
+
+/* Date-pickers */
+.active.day,
+.active.month,
+.active.year,
+.active.decade,
+.active.century {
+    background-image: linear-gradient(to bottom,#dd6bc4,#d342b3) !important;
+}
+
+.ui-visual-focus {
+    box-shadow: 0 0 0 0.2rem rgb(211 66 179 / 50%) !important;
+}
+
+/* Home page styles */
+.page-title {
+    color: #dd6bc4;
+}
+
+.advanced-filters-container {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.control-label {
+    font-weight: bold;
+}
+
+.channel-label {
+    width: 100%;
+}
+
+@media screen and (max-width: 992px) {
+    .channel-label {
+        font-size: 13px !important; /* this fixes issues with the videogamedunkey label getting cut off */
+    }
+}
+
+.home-radio-btn {
+    accent-color: #dd6bc4;
+}
+
+.icon {
+    display: inline-block;
+    width: 1em;
+    height: 1em;
+    stroke-width: 0;
+    stroke: currentColor;
+    fill: currentColor;
+}
+
+.icon-cog {
+    font-size: 17px
+}
+
+.label-required::after {
+    content: "*";
+    font-weight: bold;
+    color: red;
+    margin-left: 2px;
+}
+
+/* Search Result styles */
+.search-results-container {
+    margin-top: 10px;
+}
+
+.search-result-col {
+    margin-bottom: 10px;
+}
+
+.search-result-col-inner {
+    border: 1px solid black;
+    border-radius: 3px;
+    height: 100%;
+    cursor: pointer;
+}
+
+    .search-result-col-inner:hover {
+        box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    }
+
+.video-thumbnail-container {
+    position: relative;
+}
+
+.video-thumbnail {
+    width: 100%;
+}
+
+.video-timestamp {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background-color: #333333;
+    color: #ffffff;
+    padding: 0 3px 0 3px;
+}
+
+.video-title {
+    max-height: 4.4rem;
+    overflow: hidden;
+    -webkit-line-clamp: 1;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    text-overflow: ellipsis;
+    white-space: normal;
+    padding: 3px;
+    text-align: left;
+    font-size: 13px;
+    font-weight: 500;
+    background-color: #e797d5;
+}
+
+.video-caption {
+    padding: 5px;
+    font-weight: 500;
+}
+
+/* FAQ styles */
+#unsupported-videos-table th,
+#unsupported-videos-table td {
+    padding: 6px;
+    border: 1px solid #dddddd;
+}
+
+#unsupported-videos-table tr:nth-child(even) {
+    background-color: whitesmoke;
+}
+
+/* Quiz Styles */
+#start-btn {
+    margin-top: 10px;
+    width: 100%;
+}
+
+.score-card {
+    border: 1px solid #212529;
+    border-radius: 5px;
+    padding: 15px;
+    margin-left: 15px;
+    background-color: #e797d5;
+    color: #212529;
+}

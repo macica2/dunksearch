@@ -1,0 +1,679 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home Page - DunkSearch</title>
+    <script src="./assets/lib/jquery/dist/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <link href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" rel="stylesheet" />
+    <link rel="stylesheet" href="./assets/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="./assets/css/site.css" />
+    <link rel="icon" href="./favicon.ico" />
+    <script src="./assets/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src='./assets/lib/sql-js-fts5/sql-wasm.js'></script>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">DunkSearch</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="/">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="FAQ">FAQs</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="Quiz">Quiz</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container-fluid">
+        <main role="main" class="pb-3">
+            <div class="text-center">
+                <h1 class="display-4 page-title">DunkSearch</h1>
+                <p>Search video captions from Dunkey and friends</p>
+                <div id="file-select-div">
+                    <br />
+                    Due to limited bandwidth, to use this search tool you must first download a local copy of the captions database.<br />
+                    After doing this once, you'll be able to reuse the file for any future searches.<br />
+                    You will only have to download the file again if you want to search newer captions.<br />
+                    <br />
+                    Click <a href="./assets/data/DunkSearchCaptions.db" download="DunkSearchCaptions.db">HERE</a> to download the latest captions database (51.3 MB, last updated 2026-11-09)
+                    <br />
+                    <br />
+                    <button id="upload-btn" class="btn btn-primary" onclick="openFilePicker()">Select Database File</button>
+                    <input type="file" accept=".db" id="file-input" style="display:none" />
+                </div>
+                <div id="search-div" style="display:none">
+                    <form id="SearchForm" action="/" method="post" autocomplete="off">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <div class="input-group form-group">
+                                        <input class="input-validation-error form-control"
+                                               data-val="true"
+                                               data-val-required="The Search Term field is required."
+                                               id="SearchTerm"
+                                               name="SearchTerm"
+                                               placeholder="Enter a search term..."
+                                               type="text"
+                                               value="">
+                                        <div class="input-group-append">
+                                            <button id="search-btn" class="btn btn-primary" type="submit">Search</button>
+                                        </div>
+                                        <div class="input-group-append">
+                                            <a id="advanced-filters-btn" class="btn btn-outline-secondary" data-toggle="collapse" href="#advancedFilters" role="button" aria-expanded="true" aria-controls="advancedFilters">
+                                                <svg class="icon icon-cog">
+                                                    <use xlink:href="#icon-cog"></use>
+                                                </svg>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="collapse advanced-filters-container show" id="advancedFilters">
+                                <div class="card card-body">
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="control-label">
+                                                <label class="control-label label-required" for="ChannelOptions">Channels</label>
+                                            </div>
+                                            <div class="row" id="channel-options">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="control-label">
+                                                <label class="control-label label-required" for="SearchMode">Search Mode</label>
+                                                <i data-toggle="tooltip" data-placement="top" title="See the FAQs page for a full explanation of search modes" style="margin-left:5px">
+                                                    <svg class="icon icon-question"><use xlink:href="#icon-question"></use></svg>
+                                                </i>
+                                            </div>
+                                            <div>
+                                                <label>Normal </label>
+                                                <input checked="checked" class="home-radio-btn" data-val="true" data-val-required="The Search Mode field is required." id="SearchMode" name="SearchMode" type="radio" value="Normal">
+                                                <label style="margin-left:10px">Expert </label>
+                                                <input class="home-radio-btn" id="SearchMode" name="SearchMode" type="radio" value="Expert">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="control-label" for="VideoId">Video</label>
+                                                <select id="VideoId" name="VideoId" class="form-control" style="width:100%;">
+                                                    <option value=""></option>
+                                                    <!--@if (Model.VideoId != null)
+                                                    {
+                                                    <option value="@Model.VideoId" selected="selected">@Model.DefaultVideoName</option>
+                                                    }-->
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="control-label" for="CaptionTypeId">Caption Language</label>
+                                                <select id="CaptionTypeId" name="CaptionTypeId" class="form-control" style="width:100%;" asp-for="@Model.CaptionTypeId">
+                                                    <option value=""></option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="control-label" for="UploadDateFrom">Upload Date Range - Start Date</label>
+                                                <input class="form-control" id="UploadDateFrom" name="UploadDateFrom" type="text" value="">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label class="control-label" for="UploadDateTo">Upload Date Range - End Date</label>
+                                                <input class="form-control" id="UploadDateTo" name="UploadDateTo" type="text" value="">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="SearchResultsPartial"></div>
+
+                <!-- Modal -->
+                <div class="modal fade" id="youtubeVideoModal" tabindex="-1" role="dialog" aria-labelledby="youtubeVideoModalTitle" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered modal-lg" role="document" style="max-width:fit-content">
+                        <div class="modal-content">
+                            <div class="modal-body" id="youtube-modal-body">
+                                <div id="youtube-player"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SVG for the cog, from icomoon.io -->
+            <svg aria-hidden="true" style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <defs>
+                    <symbol id="icon-cog" viewBox="0 0 32 32">
+                        <path d="M29.181 19.070c-1.679-2.908-0.669-6.634 2.255-8.328l-3.145-5.447c-0.898 0.527-1.943 0.829-3.058 0.829-3.361 0-6.085-2.742-6.085-6.125h-6.289c0.008 1.044-0.252 2.103-0.811 3.070-1.679 2.908-5.411 3.897-8.339 2.211l-3.144 5.447c0.905 0.515 1.689 1.268 2.246 2.234 1.676 2.903 0.672 6.623-2.241 8.319l3.145 5.447c0.895-0.522 1.935-0.82 3.044-0.82 3.35 0 6.067 2.725 6.084 6.092h6.289c-0.003-1.034 0.259-2.080 0.811-3.038 1.676-2.903 5.399-3.894 8.325-2.219l3.145-5.447c-0.899-0.515-1.678-1.266-2.232-2.226zM16 22.479c-3.578 0-6.479-2.901-6.479-6.479s2.901-6.479 6.479-6.479c3.578 0 6.479 2.901 6.479 6.479s-2.901 6.479-6.479 6.479z"></path>
+                    </symbol>
+                </defs>
+            </svg>
+            <!-- SVG for the question mark icon, from icomoon.io -->
+            <svg aria-hidden="true" style="position: absolute; width: 0; height: 0; overflow: hidden;" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <defs>
+                    <symbol id="icon-question" viewBox="0 0 32 32">
+                        <path d="M14 22h4v4h-4zM22 8c1.105 0 2 0.895 2 2v6l-6 4h-4v-2l6-4v-2h-10v-4h12zM16 3c-3.472 0-6.737 1.352-9.192 3.808s-3.808 5.72-3.808 9.192c0 3.472 1.352 6.737 3.808 9.192s5.72 3.808 9.192 3.808c3.472 0 6.737-1.352 9.192-3.808s3.808-5.72 3.808-9.192c0-3.472-1.352-6.737-3.808-9.192s-5.72-3.808-9.192-3.808zM16 0v0c8.837 0 16 7.163 16 16s-7.163 16-16 16c-8.837 0-16-7.163-16-16s7.163-16 16-16z"></path>
+                    </symbol>
+                </defs>
+            </svg>
+
+
+
+        </main>
+    </div>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/css/bootstrap-datepicker.min.css" />
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datepicker/1.9.0/js/bootstrap-datepicker.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+    <script type="text/javascript">
+
+        // Keep track if search was clicked.
+        // Used to prevent loading on small devices if scrolling to bottom is possible before searching.
+        var searchStarted = false;
+        // Maps the channel ID to its index to help with URL parameter logic
+        var channels = {};
+        // SQL-JS references
+        var db = null;
+        var SQL = null;
+
+        $(document).ready(function ()
+        {
+            //
+            // Listen for user uploading the DB file
+            // TODO needs error handling probably
+            //
+            $("#file-input").on("change", function ()
+            {
+                const f = document.getElementById('file-input').files[0];
+                const r = new FileReader();
+                r.onload = function ()
+                {
+                    const Uints = new Uint8Array(r.result);
+                    db = new SQL.Database(Uints);
+                    initSearchForm();
+                }
+                r.readAsArrayBuffer(f);
+            });
+
+
+            //
+            // Set up the datepickers
+            //
+            initializeDatepicker("UploadDateFrom", "UploadDateTo", "setStartDate");
+            initializeDatepicker("UploadDateTo", "UploadDateFrom", "setEndDate");
+
+            //
+            // Set up the form submit listener to load the search results.
+            // Used for starting new searches
+            //
+            $('#SearchForm').on('submit', function (e)
+            {
+                // prevents form from submitting standard way, causing page refresh
+                e.preventDefault();
+                //console.log("in onSubmit");
+                searchStarted = true;
+
+                // do nothing if nothing or whitespace was entered in the search bar
+                var searchTerm = $("#SearchTerm").val();
+                if (!searchTerm || !searchTerm.trim())
+                {
+                    return;
+                }
+
+                // If the advanced filters section is showing, hide it
+                if ($("#advancedFilters").hasClass("show"))
+                {
+                    $("#advanced-filters-btn").click();
+                }
+
+                // Reset page number to 1 if user is starting a new search after paging
+                $("#PageNumber").val(1);
+
+                search();
+
+                // Update the URL parameters so user can copy/paste this search request
+                updateUrlParams();
+            });
+
+            //
+            //
+            //
+            $('#youtubeVideoModal').on('hidden.bs.modal', function (e)
+            {
+                // when user closes modal, unload the modal contents to stop the video
+                // and prepare it for the next video
+                $("#youtube-modal-body").html("<div id='youtube-player'></div>");
+            })
+
+            //
+            // Register the YouTube IFrame player asynchronously
+            //
+            var tag = document.createElement('script');
+            tag.src = "https://www.youtube.com/iframe_api";
+            var firstScriptTag = document.getElementsByTagName('script')[0];
+            firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
+            // Enable bootstrap tooltips
+            $('[data-toggle="tooltip"]').tooltip()
+        });
+
+        function openFilePicker()
+        {
+            $("#file-input").click();
+        }
+
+        async function initSql()
+        {
+            SQL = await initSqlJs({
+                // locateFile returns the URL for the requested wasm file
+                locateFile: (filename) => `./assets/lib/sql-js-fts5/${filename}`,
+            });
+        }
+        initSql();
+
+        function initSearchForm()
+        {
+            // Load channel options
+            initChannelOptions();
+            initCaptionTypes();
+            initVideos();
+            $("#file-select-div").hide();
+            // if any URL parameters were passed in,
+            // then automatically start the search on page load.
+            var searchParams = window.location.search;
+            if (searchParams != null && searchParams != "" && searchParams != "?")
+            {
+                parseSearchParams(searchParams);
+                search();
+            }
+            $("#search-div").show();
+        }
+
+        function initChannelOptions()
+        {
+            const results = db.exec("SELECT * FROM channel ORDER BY channel_id ASC");
+            const { columns, values } = results[0];
+
+            // Convert to array of objects for easier use
+            const rows = values.map((row) =>
+                Object.fromEntries(columns.map((col, i) => [col, row[i]]))
+            );
+            rows[0].selected = true; // mark videogamedunkey as default selected channel
+            let returnHtml = "";
+            for (let i = 0; i < rows.length; i++)
+            {
+                returnHtml += `<div class="col-sm-6">
+                                <label class="channel-label ui-checkboxradio-label ui-corner-all ui-button ui-widget ${rows[i].selected == true ? "ui-checkboxradio-checked ui-state-active" : ""}" for="ChannelOptions[${i}].selected">${rows[i].name}</label>
+                                <input class="channel-choice ui-checkboxradio ui-helper-hidden-accessible" data-val="true" data-val-required="The Selected field is required." id="ChannelOptions[${i}].selected" name="ChannelOptions[${i}].selected" type="checkbox" value="true" ${rows[i].selected == true ? "checked=\"checked\"" : ""}>
+                                <input data-val="true" data-val-required="The ChannelId field is required." id="ChannelOptions_${i}__ChannelId" name="ChannelOptions[${i}].ChannelId" type="hidden" value="${rows[i].channel_id}">
+                            </div>`;
+                channels[rows[i].channel_id] = i;
+            }
+            $("#channel-options").html(returnHtml);
+            //
+            // Set up the channel choice radio buttons
+            //
+            $(".channel-choice").checkboxradio({
+                icon: false
+            });
+        }
+
+        function initCaptionTypes()
+        {
+            const results = db.exec("SELECT * FROM caption_type ORDER BY caption_type_id ASC");
+            const { columns, values } = results[0];
+
+            const rows = values.map((row) =>
+                Object.fromEntries(columns.map((col, i) => [col, row[i]]))
+            );
+
+            for (let i = 0; i < rows.length; i++)
+            {
+                $("#CaptionTypeId").append(`<option value="${rows[i].caption_type_id}">${rows[i].name}</option>`);
+            }
+            //
+            // Set up the select2 dropdown
+            //
+            $("#CaptionTypeId").select2({
+                width: 'resolve',
+                minimumResultsForSearch: -1,
+                allowClear: true,
+                placeholder: "Select a caption language"
+            });
+        }
+
+        function initVideos()
+        {
+            const results = db.exec("SELECT * FROM video ORDER BY title ASC");
+            const { columns, values } = results[0];
+
+            const rows = values.map((row) =>
+                Object.fromEntries(columns.map((col, i) => [col, row[i]]))
+            );
+
+            for (let i = 0; i < rows.length; i++)
+            {
+                $("#VideoId").append(`<option value="${rows[i].video_id}">${rows[i].title}</option>`);
+            }
+            //
+            // Set up the select2 dropdown
+            //
+            $("#VideoId").select2({
+                width: 'resolve',
+                //minimumInputLength: 3,
+                allowClear: true,
+                placeholder: "Select a video"
+            });
+        }
+
+        /**
+         * Initializes the bootstrap datepicker and makes it so
+         * the dependent datepicker date range is limited by the input datepicker
+         */
+        function initializeDatepicker(inputPickerId, dependentPickerId, methodName)
+        {
+            $("#" + inputPickerId).datepicker({
+                clearBtn: true
+            });
+            $("#" + inputPickerId).on("changeDate", function (selected)
+            {
+                var cutoffDate = (selected.date == null) ? null : new Date(selected.date.valueOf())
+                $("#" + dependentPickerId).datepicker(methodName, cutoffDate);
+            });
+        }
+
+        function search()
+        {
+            var formData = Object.fromEntries(new FormData(document.forms.SearchForm));
+            let searchTerm = formData["SearchTerm"];
+            searchTerm = searchTerm.trim();
+            let match = "";
+            if (formData["SearchMode"] == "Normal")
+            {
+                searchTerm = searchTerm.replaceAll("'", "''").replaceAll('"', '\"\"');
+                match = `MATCH '"${searchTerm}"'`;
+            }
+            else
+            {
+                match = `MATCH '${searchTerm}'`;
+            }
+
+            let filters = [];
+
+            if (formData["CaptionTypeId"] != "")
+            {
+                filters.push(`caption_type_id = ${formData["CaptionTypeId"]}`);
+            }
+
+            if (formData["VideoId"] != "")
+            {
+                filters.push(`video_id = ${formData["VideoId"]}`);
+            }
+
+            if (formData["UploadDateFrom"] != "")
+            {
+                let unixTime = Math.floor(new Date(formData["UploadDateFrom"]).getTime() / 1000);
+                filters.push(`upload_date >= ${unixTime}`);
+            }
+
+            if (formData["UploadDateTo"] != "")
+            {
+                let unixTime = Math.floor(new Date(formData["UploadDateTo"]).getTime() / 1000);
+                filters.push(`upload_date <= ${unixTime}`);
+            }
+
+            let channelIndex = 0;
+            let channelIds = [];
+            while (true)
+            {
+                if (formData[`ChannelOptions[${channelIndex}].ChannelId`] != undefined)
+                {
+                    if (formData[`ChannelOptions[${channelIndex}].selected`] == "true")
+                    {
+                        channelIds.push(formData[`ChannelOptions[${channelIndex}].ChannelId`]);
+                    }
+                }
+                else
+                {
+                    break; // exit loop once we've reached a channel index not present
+                }
+                channelIndex += 1;
+            }
+            if (channelIds.length != 0)
+            {
+                filters.push("channel_id IN (" + channelIds.join() + ")");
+            }
+
+            let query = `WITH fts_matches AS (
+                SELECT rowid, caption_text, rank
+                FROM caption_fts
+                WHERE caption_text ${match}
+                )
+                SELECT * from fts_matches ftsm inner join vw_caption vwc on ftsm.rowid = vwc.caption_id
+                ${filters.length > 0 ? "WHERE " + filters.join(" AND ") : ""}
+                order by vwc.upload_date ASC, vwc.start_seconds ASC
+            `;
+            const results = db.exec(query); // TODO add a try catch with alert, for syntax errors.
+            if (results.length > 0)
+            {
+                const { columns, values } = results[0];
+                const rows = values.map((row) =>
+                    Object.fromEntries(columns.map((col, i) => [col, row[i]]))
+                );
+                let htmlResults = [];
+                let htmlReturnVal = `<div class="container-fluid search-results-container"><div class="row">`;
+                for (let i = 0; i < rows.length; i++)
+                {
+                    let caption = rows[i];
+                    htmlResults.push(`
+                                    <div class="col-xs-12 col-sm-6 col-md-4 col-lg-3 col-xl-2 search-result-col">
+                                        <div class="search-result-col-inner" onclick="showYouTubePlayer('${caption.yt_video_id}', ${caption.start_seconds})">
+                                            <div class="video-thumbnail-container">
+                                                <img class="video-thumbnail" src="https://img.youtube.com/vi/${caption.yt_video_id}/mqdefault.jpg" />
+                                                <span class="video-timestamp">${getTimestamp(caption.start_seconds)}</span>
+                                            </div>
+                                            <div>
+                                                <div class="video-title" title="${caption.title}">${caption.title}</div>
+                                            </div>
+                                            <div class="video-caption">
+                                                ${caption.caption_text}
+                                            </div>
+                                        </div>
+                                    </div>
+                                `);
+
+                }
+                htmlReturnVal += htmlResults.join("");
+                htmlReturnVal += `</div></div>`; // close container and row
+                $("#SearchResultsPartial").html(htmlReturnVal);
+            }
+            else
+            {
+                $("#SearchResultsPartial").html(`
+                                <div style="margin-top:20px">
+                                    <p><strong>No results found.</strong> Try using advanced filters or change the search term.</p>
+                                </div>`
+                );
+            }
+        }
+
+        function getTimestamp(startSeconds)
+        {
+            // thanks https://stackoverflow.com/a/1322798
+            let hours = Math.floor(startSeconds / 3600);
+            startSeconds %= 3600;
+            let minutes = Math.floor(startSeconds / 60);
+            let seconds = startSeconds % 60;
+            let retVal = "";
+            if (hours > 0)
+            {
+                retVal += hours + ":";
+            }
+            if (minutes < 10 && hours > 0)
+            {
+                retVal += "0";
+            }
+            retVal += minutes + ":";
+            if (seconds < 10)
+            {
+                retVal += "0";
+            }
+            retVal += seconds;
+
+            return retVal;
+        }
+
+        function showYouTubePlayer(videoId, startSeconds)
+        {
+            //console.log('starting showYouTubePlayer');
+            $("#youtube-player").html(null);
+            var defaultPlayerWidth = 640;
+            // if not enough room for default width, use dynamic width based on screen size.
+            var playerWidth = Math.min(window.innerWidth - 50, defaultPlayerWidth);
+            var playerHeight = (playerWidth * 9) / 16; // ensures player is in 16:9 format
+            var player = new YT.Player('youtube-player', {
+                width: playerWidth,
+                height: playerHeight,
+                videoId: videoId,
+                playerVars: {
+                    playsinline: 1,
+                    start: startSeconds,
+                    enablejsapi: 1,
+                    autoplay: 1,
+                },
+                events: {
+                    //< !-- 'onReady': onPlayerReady, -- >
+                    //< !-- 'onStateChange': onPlayerStateChange-- >
+                }
+            });
+
+            $('#youtubeVideoModal').modal('show')
+        }
+
+        function parseSearchParams(searchParams)
+        {
+            if (searchParams.indexOf("ChannelIds") > -1)
+            {
+                // normally videogamedunkey is selected by default
+                // but let's clear it so we can set only the specified channels.
+                // assume it's always the first one TODO probably make this smarter
+                $(`[id="ChannelOptions[0].selected"]`).prop("checked", false);
+                $(`label[for="ChannelOptions[0].selected"]`).removeClass("ui-checkboxradio-checked ui-state-active");
+            }
+            let queryString = new URLSearchParams(searchParams);
+            for (let pair of queryString.entries())
+            {
+                switch (pair[0])
+                {
+                    case "SearchTerm":
+                        $("#SearchTerm").val(pair[1]);
+                        break;
+                    case "VideoId":
+                        $("#VideoId").val(pair[1]);
+                        $("#VideoId").trigger("change");
+                        break;
+                    case "CaptionTypeId":
+                        $("#CaptionTypeId").val(pair[1]);
+                        $("#CaptionTypeId").trigger("change");
+                        break;
+                    case "UploadDateFrom":
+                        $("#UploadDateFrom").datepicker("setDate", pair[1]);
+                        break;
+                    case "UploadDateTo":
+                        $("#UploadDateTo").datepicker("setDate", pair[1]);
+                        break;
+                    case "SearchMode":
+                        $("input[name='SearchMode'][value='" + pair[1] + "']").click();
+                        break;
+                    case "ChannelIds":
+                        let channelIndex = channels[pair[1]];
+                        $(`[id="ChannelOptions[${channelIndex}].selected"]`).prop("checked", true);
+                        $(`label[for="ChannelOptions[${channelIndex}].selected"]`).addClass("ui-checkboxradio-checked ui-state-active");
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        //
+        // Updates all the URL search parameters
+        //
+        function updateUrlParams()
+        {
+            var url = new URL(window.location);
+            updateUrlParam(url, "SearchTerm", $("#SearchTerm").val());
+            updateUrlParam(url, "VideoId", $("#VideoId").val());
+            updateUrlParam(url, "CaptionTypeId", $("#CaptionTypeId").val());
+            updateUrlParam(url, "UploadDateFrom", $("#UploadDateFrom").val());
+            updateUrlParam(url, "UploadDateTo", $("#UploadDateTo").val());
+            updateUrlParam(url, "SearchMode", $("input[name='SearchMode']:checked").val());
+            var channelIds = [];
+            var channelCheckboxes = $(".channel-choice");
+            for (var i = 0; i < channelCheckboxes.length; i++)
+            {
+                if (channelCheckboxes[i].checked)
+                {
+                    channelIds.push($("#ChannelOptions_" + i + "__ChannelId").val());
+                }
+            }
+            updateUrlParam(url, "ChannelIds", channelIds);
+
+            window.history.pushState({}, null, url);
+        }
+
+        //
+        // Updates a single URL search parameter
+        //
+        function updateUrlParam(url, paramName, value)
+        {
+            if (value == "" || value == null)
+            {
+                url.searchParams.delete(paramName);
+            }
+            else
+            {
+                if (paramName != "ChannelIds")
+                {
+                    url.searchParams.set(paramName, value);
+                }
+                else
+                {
+                    // ChannelIds need to be a list in order to bind to model, so we have to append multiple
+                    url.searchParams.delete(paramName);
+                    for (var i = 0; i < value.length; i++)
+                    {
+                        url.searchParams.append("ChannelIds", value[i]);
+                    }
+                }
+            }
+        }
+
+    </script>
+</body>
+</html>

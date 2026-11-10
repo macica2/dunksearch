@@ -1,0 +1,1 @@
+﻿Credit for the pre-compiled version of sql.js that includes FTS5: https://github.com/Erdbeergeist/sql.js-fts5 (MIT license)

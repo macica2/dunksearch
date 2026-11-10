@@ -1,0 +1,1092 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Frequently Asked Questions - DunkSearch</title>
+    <script src="../assets/lib/jquery/dist/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script>
+    <link href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css" rel="stylesheet" />
+    <link rel="stylesheet" href="../assets/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="../assets/css/site.css" />
+    <link rel="icon" href="../favicon.ico" />
+    <script src="../assets/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">DunkSearch</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="../">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="./">FAQs</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" href="../Quiz">Quiz</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container-fluid">
+        <main role="main" class="pb-3">
+            <div class="container">
+                <h4 style="text-align:center">Frequently Asked Questions</h4>
+                <div id="accordion">
+                    <div class="card">
+                        <div class="card-header" id="headingZero">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseZero" aria-expanded="false" aria-controls="collapseZero">
+                                    What are the different search modes?
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseZero" class="collapse" aria-labelledby="headingZero" data-parent="#accordion">
+                            <div class="card-body">
+                                <b>Normal mode</b> uses a simplified method of searching. Whatever you search for is what it will look for, with some caveats.
+                                It will trim out punctuation and it will ignore capitalization.
+                                The order of the words matters too, so searching for "Did I mine that" will not find results for "I did mine that".
+                                The words you search for must come one after another in the caption, so searching for "one two three" will not find results for "one two and three".
+                                <br><br>
+                                <b>Expert mode </b> gives you a lot more control, but is harder to learn.
+                                You can refer to the <a href="https://sqlite.org/fts5.html#full_text_query_syntax" target="_blank">SQLite Full Text Search documentation</a> to understand how it works under the hood and see all the possible options.
+                                Alternatively, you can learn by messing with these example search terms.
+                                <br />
+                                <ul>
+                                    <li>
+                                        First of all, if you use single or double quotes in your search term, you'll need to escape them by doubling them up.
+                                        You may also need to wrap the whole search term in double quotes sometimes.
+                                        Example: <code>"""I''ll be back"", The wild Dunk thinks."</code>
+                                    </li>
+                                    <li>
+                                        <code>kill OR butt</code> - will return captions with "kill", captions with "butt", and captions with "kill butt"
+                                    </li>
+                                    <li>
+                                        <code>switch NOT nintendo</code> - will find captions with the word "switch" but not "nintendo"
+                                    </li>
+                                    <li>
+                                        <code>Ninten*</code> - will find words with "Ninten" as the prefix, like "Nintendo" and "Nintendogs"
+                                    </li>
+                                    <li>
+                                        <code>kill* NOT kill</code> - you can combine filters, and in this case it will return captions with "killed" or "kills" but not "kill"
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header" id="headingOne">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseOne" aria-expanded="false" aria-controls="collapseOne">
+                                    Why can't I find what I'm looking for?
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseOne" class="collapse" aria-labelledby="headingOne" data-parent="#accordion">
+                            <div class="card-body">
+                                <ul>
+                                    <li>Try using the optional filters to narrow down the results</li>
+                                    <li>Try searching for a key word or 2 instead of an entire quote. Sometimes different words have better results.</li>
+                                    <li>Try alternate spellings of words, since sometimes the auto-generated captions aren't quite right.</li>
+                                    <li>If the quote was broken into multiple captions, such as "I'll have the spaghetti" and "and meatballs", then you may need to try searching for just one part of the quote.</li>
+                                    <li>For videos with auto-generated subtitles, certain swear words are replaced with [ __ ] which is not searchable. If your search term includes a swear and the captions are auto-generated, then you likely won't be able to find the quote without changing your search term.</li>
+                                    <li>Some videos are not able to be searched. See the <i>Are there any unsupported videos?</i> question below.</li>
+                                    <li>You can try using a tool like <a href="https://sqlitebrowser.org/" target="_blank">DB Browser for SQLite</a> to open the database file and directly inspect and query the data.</li>
+                                    <li>If you still cannot find a quote, try asking in the Weekly Search Megathread on the <a href="https://www.reddit.com/r/videogamedunkey/" target="_blank">videogamedunkey subreddit.</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header" id="headingTwo">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseTwo" aria-expanded="false" aria-controls="collapseTwo">
+                                    How does the site work on a technical level?
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordion">
+                            <div class="card-body">
+                                <ul>
+                                    <li>I used JavaScript to extract the captions from all of Dunkey's YouTube videos and stored them in JSON files. I then processed these captions and inserted them into a database to make them easily searchable.</li>
+                                    <li>At first, I stored all these captions in a PostgreSQL database and used Full Text Search for quick searching. I also used a Linux droplet on DigitalOcean to host a .NET web app for interfacing with this database.</li>
+                                    <li>I later rebuilt the site as a static website to save money, so now it uses a SQLite database with Full Text Search. Everything else is pure HTML, CSS, and JavaScript.</li>
+                                    <li>Search results are sorted in order of video upload date, then by the timestamp in the video.</li>
+                                    <li>
+                                        YouTube doesn't actually have an API for downloading captions from other people's videos.
+                                        At one point I had an automated process that could update the site with new video captions on a nightly basis, but it was a hack that stopped working when YouTube updated their security.
+                                        It wasn't worth trying to fix it every time YouTube broke it, so now I manually run some JavaScript to extract captions. This means sometimes the site is out of date.
+                                    </li>
+                                    <li>You can view all the source code <a href="https://github.com/macica2/dunksearch" target="_blank">here</a> to learn more.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header" id="headingThree">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseThree" aria-expanded="false" aria-controls="collapseThree">
+                                    Are there any unsupported videos?
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseThree" class="collapse" aria-labelledby="headingThree" data-parent="#accordion">
+                            <div class="card-body">
+                                Below is a list of videos that cannot be searched, with a reason explaining why.
+                                In addition, the site is not automatically updated when new videos come out, so newer videos might not be available at first.
+                                I will aim to update the site on a monthly basis at least.
+                                You can search for a video using the advanced filters to see if it has been added yet.
+                                <br><br>
+                                <table id="unsupported-videos-table">
+                                    <tbody>
+                                        <tr>
+                                            <th>Channel</th>
+                                            <th>Video</th>
+                                            <th>Why is it not searchable?</th>
+                                        </tr>
+                                        <tr>
+                                            <td>All</td>
+                                            <td>Any unlisted videos</td>
+                                            <td>They are unlisted for a reason</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=wXqHtF4I3M8" target="_blank">100 Movie Recommendations in One Minute</a></td>
+                                            <td>No audio</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=ajh9e3PDAOc" target="_blank">Battlefield 2077</a></td>
+                                            <td>Music and noises only</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=wWBYZQwmJCg" target="_blank">Beast Mode Counter Strike Pwn Town</a></td>
+                                            <td>Music only</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=8MhOouhhrTU" target="_blank">Black Ops : Epic Boner Jamz</a></td>
+                                            <td>Music only</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=3S8BvTbhkY0" target="_blank">Crysis 2 - Console Version (dunkview)</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=6r5sMN_QGQs" target="_blank">Dark Knight Rises is Sold Out</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=aYDIYzPFvKc" target="_blank">Diablo 3 : Inside Look</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=KuvDsT4sRzU" target="_blank">Donkey Kong December</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=waXb8QGdEYQ" target="_blank">Dunkey and Leah's Wedding</a></td>
+                                            <td>No captions (mostly music)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=YgSSql6MAKo" target="_blank">Dunkey Dance</a></td>
+                                            <td>Music only</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=kacTMmoQPQM" target="_blank">Dunkey Die</a></td>
+                                            <td>Music only</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=Bl4X8bCVnQU" target="_blank">Dunkey's 1 Million Subs Dance Hoedown</a></td>
+                                            <td>Music only</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=IiMJzjKKtgg" target="_blank">Dunkey's Epic 30k Dunder Dance Down</a></td>
+                                            <td>Music only</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=RM9R4IFSMHQ" target="_blank">Falcom Chip !</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=o2TdptvwVKQ" target="_blank">Franken RPG</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=n0qIgPIDy00" target="_blank">funny birds have a sword fight with their beaks ROFL</a></td>
+                                            <td>Music only</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=ADW2mF94-NA" target="_blank">GIVE ME THE STUPID S RANK</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=GGEGF7cHmMU" target="_blank">Harlem Shake</a></td>
+                                            <td>Music only</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=0BqgeI1YsZc" target="_blank">John Wick Chapter 5</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=o7HUbFZW_kU" target="_blank">League of Legends : AFK Troller Strategy</a></td>
+                                            <td>Music only</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=EC-VrN9ABkk" target="_blank">League of Legends : Beo Beo Trungle</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=kdGyUvCksD8" target="_blank">League of Legends : Bird Bitch</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=RDcWc1t9XN8" target="_blank">League of Legends : Bouncy Time</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=sdnYy1b8KEY" target="_blank">League of Legends : Die Sounds</a></td>
+                                            <td>Just noises</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=VS9IhcD1YYE" target="_blank">League of Legends : Downright Dyruis</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=gDHMtw_ECjE" target="_blank">League of Legends : Dream Team</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=kCHVdq73o4s" target="_blank">League of Legends : Dubstep Singed</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=-uo-JnbtVqo" target="_blank">League of Legends : Epic Escape</a></td>
+                                            <td>Music only</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=7pOAsXK3bYs" target="_blank">League of Legends : Five Man Jungle</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=zPej5c7DU7Q" target="_blank">League of Legends : Fizz Glitch</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=YB_-T_dW2Aw" target="_blank">League of Legends : Foxstar 4D</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=c79sW3gVp8s" target="_blank">League of Legends : Gentlemen's Tribunal</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=AaxobrC3Qmo" target="_blank">League of Legends : Hell Jam</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=17XvXLHFDP0" target="_blank">League of Legends : Impressions</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=4O4SRcNBGp8" target="_blank">League of Legends : Jinx</a></td>
+                                            <td>Just noises</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=LmjHx7yIvV8" target="_blank">League of Legends : Meet the Sin</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=t88VU72eAI0" target="_blank">League of Legends : New Rengar Build</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=yQKI9oclZsk" target="_blank">League of Legends : OOO MAMA</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=Ong43KWh_x8" target="_blank">League of Legends : Ranked</a></td>
+                                            <td>Music only</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=zIoJndp0sKI" target="_blank">League of Legends : Renekton's Alt. Lore</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=Jkg8GiriHvU" target="_blank">League of Legends : Riot Points Hack Get 60k RP</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=JUFl_sDOHlM" target="_blank">League of Legends : Shoot Boys</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=WEtf3XolX9w" target="_blank">League of Legends : Slam House</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=rCsvWfEMcII" target="_blank">League of Legends : Swat Recon</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=qdroeDSpoGU" target="_blank">League of Legends : Team All Mid</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=M_avgJJvgSc" target="_blank">League of Legends : The Lion Book</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=iUejvXJ9-II" target="_blank">League of Legends : The Movie</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=YpzV6h6xiZI" target="_blank">League of Legends : Urf Rap</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=2YeTbQYF6Hk" target="_blank">League of Legends : Varus is Out</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=w5_cVzKFyTk" target="_blank">League of Legends : Weo Weo Caitlyn</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=kvwmNx5AeAs" target="_blank">League of Legends : Weo Weo Weo</a></td>
+                                            <td>Just noises</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=Mj5KiiHznJk" target="_blank">League of Legends : Wondershot Ashe</a></td>
+                                            <td>Music only</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=Wqsb7VR6EB8" target="_blank">LoL : Ashe's Revenge</a></td>
+                                            <td>Music only</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=PIJ54HCj_mY" target="_blank">LoL Cypher - Dunkey (calling out Protoman)</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=fXSjsSHWekw" target="_blank">Maneater</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=aaLiLRVeaZA" target="_blank">Metal Gear Solid Explained</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=uZfJ5S3WCY4" target="_blank">Modern Trollfare</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=TVVum6X3TuM" target="_blank">More Dunkey More Problems</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=ECQKwvEoD8o" target="_blank">Phone Men</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=iTBW6jbHgX0" target="_blank">Playtime</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=iGOMViJlQmE" target="_blank">Reacting to the FAKEST GAMER EVER !?</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=EX9aDLjKYww" target="_blank">Relaxing Space Safari</a></td>
+                                            <td>Music only</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=8qnQNe9zQmo" target="_blank">Skyman and the Boosher Mover</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=PttKq0GcnoQ" target="_blank">Soccer</a></td>
+                                            <td>Music only</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=DRnMwtdegII" target="_blank">Super Donkey Kong Shake</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=rw2sMk-PTp8" target="_blank">Super Mario 64 (Ep. 18) : The Return</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=bxKSMQ7upHg" target="_blank">Super Mario 64 (Ep. 19) : Wiggler's Red Coins</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=25kZXCwNL1s" target="_blank">Tekken 8 : Kuma's Revenge</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=6n2egb45C7E" target="_blank">The MultiVersus Killer</a></td>
+                                            <td>No captions (only 1 line of dialogue)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=mGLMi9kXTRI" target="_blank">The Next Smash Bros Roster</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=XZp6zxh2yjE" target="_blank">The Sopranos for PS2</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=Z0zxlh63RtQ" target="_blank">Trailer vs Gameplay</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=pKYeAN-_wFI" target="_blank">Whiplash and La La Land</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=dW0QCU3RPtY" target="_blank">Worms</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>videogamedunkey</td>
+                                            <td><a href="https://www.youtube.com/watch?v=6n83K-cHHg4" target="_blank">Youtubers</a></td>
+                                            <td>Just noises</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=Di2X0CUWYio" target="_blank">1000 Subbriber update!</a></td>
+                                            <td>Not a Dunkey-related video</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=bPPzmdmJkIw" target="_blank">100 subscriber special</a></td>
+                                            <td>Not a Dunkey-related video</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=xbGL3cOJxuU" target="_blank">500 Subsriber video update</a></td>
+                                            <td>Not a Dunkey-related video</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=dRXy_o9pMZo" target="_blank">Dunkey Streams Alan Wake (Day 1)</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=wqpwowPgZ1M" target="_blank">Dunkey Streams Alan Wake (Day 3.1)</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=ssI0gb_-VT8" target="_blank">Dunkey Streams Alan Wake (Day 4)</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=MYWQ-Zrlhq0" target="_blank">Dunkey Streams Ape Escape 2</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=c4VJji9skq8" target="_blank">Dunkey Streams Bayonetta</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=nvjddd638Yw" target="_blank">Dunkey Streams Bloodstained Curse of the Moon</a></td>
+                                            <td>No English captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=yLVSKknLSi4" target="_blank">Dunkey Streams Bloodstained Curse of the Moon Part 2</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=4A4pLxah13k" target="_blank">Dunkey Streams Bubble Bobble (Lemon Thursday)</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=UNIQ9Jr-BwM" target="_blank">Dunkey streams Crash 3 w/ Leah</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=mHUkc3pOPXs" target="_blank">Dunkey Streams Cyberpunk 2077</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=YOxmbbECvmk" target="_blank">Dunkey Streams Cyberpunk 2077</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=npyvqRJBVxc" target="_blank">Dunkey Streams Dark Souls 3</a></td>
+                                            <td>No English captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=LFpnXO--uMg" target="_blank">Dunkey Streams Deep Rock Galactic</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=SUgtOecQxag" target="_blank">Dunkey Streams Donkey Kong Country</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=Y-izfhSZTTc" target="_blank">Dunkey Streams Donkey Kong Country Part 2</a></td>
+                                            <td>No English captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=7Zcf7P2VKZE" target="_blank">Dunkey Streams DOOM 2016 (Peanut Thursday)</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=ZRixBu4M0GA" target="_blank">Dunkey Streams Enter the Gungeon</a></td>
+                                            <td>No English captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=zvb-PM9JOaE" target="_blank">Dunkey Streams Family Feud</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=PCRj_YyOBgc" target="_blank">Dunkey Streams Family Feud w/ Friends</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=CpiPebxElTI" target="_blank">Dunkey Streams G-Force</a></td>
+                                            <td>No English captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=8AejYCvt9_Y" target="_blank">Dunkey Streams Grand Theft Auto III and Elden Ring</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=8o1jh_jxwzQ" target="_blank">Dunkey Streams Hades and Super Mario Land</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=MIL5pqkpj-U" target="_blank">Dunkey Streams Hitman 2: Silent Assassin</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=YlekOoZbI30" target="_blank">Dunkey Streams Hollow Knight</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=AbxC9v58vg8" target="_blank">Dunkey Streams Hyper Jam</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=C3ThLFPqVkE" target="_blank">Dunkey Streams Little Nightmares</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=ksHjgXjlFfk" target="_blank">Dunkey Streams Madden 2001</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=CN7GOGmasiY" target="_blank">Dunkey Streams Mega Maker</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=Sqxff7X1wqs" target="_blank">Dunkey Streams Minecraft Saturday</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=B3sVLWKoPjs" target="_blank">Dunkey Streams Newer Super Mario</a></td>
+                                            <td>No English captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=Wj4iVmwcx7U" target="_blank">Dunkey Streams Nickelodeon All Star Brawl</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=Cl70ImeCb3Y" target="_blank">Dunkey Streams Overwatch</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=6LaEXoEBgbI" target="_blank">Dunkey Streams Overwatch</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=RVrBwctYZSE" target="_blank">Dunkey Streams Pinturillo 2</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=sYmVwfBPjp8" target="_blank">Dunkey Streams Rayman (Day 2)</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=VQKszydV1SE" target="_blank">Dunkey Streams Reaction Friday</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=55DFCwkZDP0" target="_blank">Dunkey Streams Rust (Day 1)</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=mNDIGwpnX-g" target="_blank">Dunkey Streams Rust (Day 2)</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=yMfLrSc1Nx8" target="_blank">Dunkey Streams Rust (Day 3)</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=jwAuydKDExE" target="_blank">Dunkey Streams SMW2 Yoshi's Island Part 1</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=mWN8VixYsMc" target="_blank">Dunkey Streams Star Wars: Masters of Teräs Käsi</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=ZdqYdXmX4i8" target="_blank">Dunkey Streams Summer Game Fest</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=JuI3rpduP-4" target="_blank">Dunkey Streams Super Mario Bros. 3 (Chalupa Thursday)</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=5iJrjMK3oGc" target="_blank">Dunkey Streams Super Mario Bros. 3 (Roblox Thursday)</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=tWc36Xq6TiE" target="_blank">Dunkey Streams Super Mario Sunshine</a></td>
+                                            <td>No English captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=yMnALqQo07Y" target="_blank">Dunkey Streams Super Mario Sunshine Part 2</a></td>
+                                            <td>No English captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=47TAdixLp0s" target="_blank">Dunkey Streams Super Mario Sunshine Part 3</a></td>
+                                            <td>No English captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=XNRkIy_AXSs" target="_blank">Dunkey Streams Super Mario Sunshine Part 4</a></td>
+                                            <td>No English captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=-Gxp6-wYPBQ" target="_blank">Dunkey Streams Tekken 3</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=dZWFYWG5Vqo" target="_blank">Dunkey Streams Tekken 7 &amp; Jackbox Party Pack 7</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=YNGEJMn1Z6M" target="_blank">Dunkey Streams Tekken 7 vs. Chat</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=3ZPhCBv06z0" target="_blank">Dunkey Streams The Game Awards 2020</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=2pg6qDCVx3c" target="_blank">Dunkey Streams THPS</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=itJ0doO5YFY" target="_blank">Dunkey Streams Tony Hawk's Pro Skater HD</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=nhAfo--P5Gg" target="_blank">Dunkey Streams VRChat</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=Q2kfh2Kgvt4" target="_blank">Dunkey Streams VRchat and Battlerite</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=uXLzONFCc6M" target="_blank">Dunkey Streams Waluigi's Balloon World</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=lKSfv3H2bJQ" target="_blank">Dunkey Variety Stream</a></td>
+                                            <td>No captions available</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=al6TXJf2rbk" target="_blank">Mega64 Podcast - The Main Man</a></td>
+                                            <td>Not a Dunkey-related video</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=QGsPRGtCa4A" target="_blank">MEGA64TV Bump</a></td>
+                                            <td>Not a Dunkey-related video</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=_bGcePXFJ7Y" target="_blank">Mega64 TV Bump 2018</a></td>
+                                            <td>Not a Dunkey-related video</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=guTWpVgoB48" target="_blank">Poorly Played Stream Bump 2019</a></td>
+                                            <td>No captions and not a Dunkey-related video</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=sCTJ6o4Fscg" target="_blank">RoccoClaps.mp4</a></td>
+                                            <td>Not a Dunkey-related video</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=MufMr4LU1a0" target="_blank">Top 10 Ways to Kill a Creeper in Minecraft 2023</a></td>
+                                            <td>Not a Dunkey-related video</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=yQXFYgr5BAo" target="_blank">Top 10 Ways to Kill a Creeper Project Update</a></td>
+                                            <td>Not a Dunkey-related video</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=v1ZUXvCmd5w" target="_blank">Top 10 Ways to Kill a Creeper REAL Trailer</a></td>
+                                            <td>Not a Dunkey-related video</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=5tfEqobmnUI" target="_blank">Top 10 Ways to Kill a Creeper TRAILER</a></td>
+                                            <td>Not a Dunkey-related video</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=RQ_7RNQzuYM" target="_blank">Top 5 Best Trucks to Buy in 2021 Official</a></td>
+                                            <td>Not a Dunkey-related video</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=YikhLBXfUqg" target="_blank">Top 5 Limp Bizkit Lyrics</a></td>
+                                            <td>Not a Dunkey-related video</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WaLter .NO</td>
+                                            <td><a href="https://www.youtube.com/watch?v=D3Dsfg8f8uo" target="_blank">Walter's Call to Dr. Scrape (MLK 2017)</a></td>
+                                            <td>Not a Dunkey-related video</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Dunk Tank</td>
+                                            <td><a href="https://www.youtube.com/watch?v=03y3mtV_pQc" target="_blank">Yakuza 6 : Kitano's Revenge</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Dunk Tank</td>
+                                            <td><a href="https://www.youtube.com/watch?v=iuuPt-AslJQ" target="_blank">Yakuza 6 : Kitano's Revenge</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Leahbee</td>
+                                            <td><a href="https://www.youtube.com/watch?v=1MtMQnEZW2g" target="_blank">birthday trip to disneyworld!</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Leahbee</td>
+                                            <td><a href="https://www.youtube.com/watch?v=67CFn-PXtOw" target="_blank">clay lulu polymorphs &amp; mini dunkey</a></td>
+                                            <td>Music only</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Leahbee</td>
+                                            <td><a href="https://www.youtube.com/watch?v=l1ProvUrUeg" target="_blank">disnee time</a></td>
+                                            <td>Music only</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Leahbee</td>
+                                            <td><a href="https://www.youtube.com/watch?v=ouVgKOPnVDc" target="_blank">frog</a></td>
+                                            <td>No audio</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Leahbee</td>
+                                            <td><a href="https://www.youtube.com/watch?v=rAzvFOolo0A" target="_blank">hamster</a></td>
+                                            <td>No audio</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Leahbee</td>
+                                            <td><a href="https://www.youtube.com/watch?v=ENdMy_cy67g" target="_blank">hamster christmas</a></td>
+                                            <td>Music only</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Leahbee</td>
+                                            <td><a href="https://www.youtube.com/watch?v=AN2Kv_8e2VY" target="_blank">jason and his posse</a></td>
+                                            <td>No talking</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Leahbee</td>
+                                            <td><a href="https://www.youtube.com/watch?v=RxnedjB4YHU" target="_blank">jugglin bubbles ?</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Leahbee</td>
+                                            <td><a href="https://www.youtube.com/watch?v=xgf5ctePmIA" target="_blank">mario makers !</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Leahbee</td>
+                                            <td><a href="https://www.youtube.com/watch?v=sBRNelMnr4c" target="_blank">mimi</a></td>
+                                            <td>Music only</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Leahbee</td>
+                                            <td><a href="https://www.youtube.com/watch?v=lPb0-e7Ndsg" target="_blank">mimi enjoying the weather :)</a></td>
+                                            <td>Music only</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Leahbee</td>
+                                            <td><a href="https://www.youtube.com/watch?v=htiVQ-SKGWA" target="_blank">mimi's 1st time outside!</a></td>
+                                            <td>Music only</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Leahbee</td>
+                                            <td><a href="https://www.youtube.com/watch?v=UtThTcROWwY" target="_blank">more disney!</a></td>
+                                            <td>No captions (mostly music)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Leahbee</td>
+                                            <td><a href="https://www.youtube.com/watch?v=tjKP0HJ4tsg" target="_blank">my magical fairy garden!</a></td>
+                                            <td>Music only</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Leahbee</td>
+                                            <td><a href="https://www.youtube.com/watch?v=NEFiSxZPqYw" target="_blank">pax east 2016!</a></td>
+                                            <td>No captions (mostly music)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Leahbee</td>
+                                            <td><a href="https://www.youtube.com/watch?v=Ge9xPeyqo7Q" target="_blank">pax west 2016!</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Leahbee</td>
+                                            <td><a href="https://www.youtube.com/watch?v=jPJlXq3Ag9A" target="_blank">playing your mario levels! 1/2</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Leahbee</td>
+                                            <td><a href="https://www.youtube.com/watch?v=DRJpEpYzfpg" target="_blank">playing your mario levels! 2/2</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Leahbee</td>
+                                            <td><a href="https://www.youtube.com/watch?v=UJZxbFq70VU" target="_blank">polymer clay (braum) poro!</a></td>
+                                            <td>Music only</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Leahbee</td>
+                                            <td><a href="https://www.youtube.com/watch?v=0MLSC97Z1iE" target="_blank">POP the PIG board game!</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Leahbee</td>
+                                            <td><a href="https://www.youtube.com/watch?v=dpTP0nf-5tg" target="_blank">seattle &amp; pax west 2017 vlog!</a></td>
+                                            <td>No captions</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Leahbee</td>
+                                            <td><a href="https://www.youtube.com/watch?v=9663nNV1OAE" target="_blank">speed painting rainbow trout</a></td>
+                                            <td>Music only</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Leahbee</td>
+                                            <td><a href="https://www.youtube.com/watch?v=MI0hZNBWzDU" target="_blank">universal pt. 1!</a></td>
+                                            <td>No captions (mostly music)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Leahbee</td>
+                                            <td><a href="https://www.youtube.com/watch?v=9BTwVAWJlcc" target="_blank">universal pt. 2!!</a></td>
+                                            <td>Music only</td>
+                                        </tr>
+
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header" id="headingFour">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFour" aria-expanded="false" aria-controls="collapseFour">
+                                    How much does it cost to run the site? Can I donate to support the site?
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseFour" class="collapse" aria-labelledby="headingFour" data-parent="#accordion">
+                            <div class="card-body">
+                                It used to cost $20+ per month for the DigitalOcean droplet, managed PostgreSQL database, and domain name.<br />
+                                Thanks to Nekoweb, this site is now available completely for free. Since it is free, I have no need for donations.
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header" id="headingFive">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseFive" aria-expanded="false" aria-controls="collapseFive">
+                                    Can I make a suggestion, provide feedback, or help with the site?
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseFive" class="collapse" aria-labelledby="headingFive" data-parent="#accordion">
+                            <div class="card-body">
+                                Sure. If you know how to use <a href="https://github.com/macica2/dunksearch" target="_blank">GitHub</a>, you can submit a pull request or an issue.
+                                You can also try posting a comment in the Weekly Search Megathread on the <a href="https://www.reddit.com/r/videogamedunkey/" target="_blank">videogamedunkey subreddit.</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header" id="headingSix">
+                            <h5 class="mb-0">
+                                <button class="btn btn-link collapsed" data-toggle="collapse" data-target="#collapseSix" aria-expanded="false" aria-controls="collapseSix">
+                                    Did you use generative AI to make this site?
+                                </button>
+                            </h5>
+                        </div>
+                        <div id="collapseSix" class="collapse" aria-labelledby="headingSix" data-parent="#accordion">
+                            <div class="card-body">
+                                No, it's human slop.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+</body>
+</html>

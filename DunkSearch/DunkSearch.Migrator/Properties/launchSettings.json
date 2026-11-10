@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "DunkSearch.Migrator": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "DOTNET_ENVIRONMENT": "Production"
+      }
+    }
+  }
+}
