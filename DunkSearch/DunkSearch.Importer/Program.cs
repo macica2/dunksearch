@@ -1,5 +1,6 @@
 ﻿using DunkSearch.Domain;
 using DunkSearch.Domain.Entities;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using System;
@@ -18,25 +19,30 @@ namespace DunkSearch.Importer
 
             // Initialize config file and DB context
             var configuration = GetConfiguration();
-            var dataContext = GetDataContext(configuration);
+            var sqliteDbPath = configuration["SQLiteDbPath"];
+            using var sqliteConnection = new SqliteConnection("Data Source=" + sqliteDbPath);
+            sqliteConnection.Open();
+
+            //var dataContext = GetDataContext(configuration);
 
             // Load channel and file paths based on config file
-            var channels = GetChannels(configuration, dataContext);
+            var channels = GetChannels(configuration, sqliteConnection);
             var filePaths = GetFilePaths(configuration);
 
             // Load CaptionTypes up front for reuse
-            var captionTypes = dataContext.CaptionTypes.ToList();
+            var captionTypes = GetCaptionTypes(sqliteConnection);
 
             // Loop through each input file
             foreach (var filePath in filePaths)
             {
-                ProcessFile(filePath, dataContext, captionTypes, channels);
+                ProcessFile(filePath, sqliteConnection, captionTypes, channels);
             }
 
             // If anything fails, log it
             // TODO
 
             // After it finishes, print out if it's done and how many were successful TODO
+            sqliteConnection.Close();
             Console.WriteLine("Done! Press enter to close.");
             Console.ReadLine();
         }
@@ -83,21 +89,53 @@ namespace DunkSearch.Importer
         /// this helps prevent typos/bad data. Assume admin creates channel manually.
         /// </summary>
         /// <returns></returns>
-        private static List<Channel> GetChannels(IConfigurationRoot configuration, DataContext dataContext)
+        private static List<Channel> GetChannels(IConfigurationRoot configuration, SqliteConnection connection)
         {
-            // by default, we load all channels. This assumes the channel name is provided in the video extract JSON file.
-            var channels = dataContext.Channels.ToList();
-
+            var select = connection.CreateCommand();
+            select.CommandText = "SELECT channel_id, name FROM channel";
             // If the app settings config file provided a ChannelName, then load that channel instead.
             // This supports the legacy JSON files that don't include the channel name,
             // in case we ever need to import those again.
             var channelName = configuration["ChannelName"];
             if (!string.IsNullOrEmpty(channelName))
             {
-                channels = channels.Where(p => p.Name == channelName).ToList();
+                select.CommandText += " WHERE name = $channelName";
+                select.Parameters.AddWithValue("$channelName", channelName);
+            }
+
+            var channels = new List<Channel>();
+            using (var reader = select.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    channels.Add(new Channel() { ChannelId = reader.GetInt32(0), Name = reader.GetString(1) });
+                }
             }
 
             return channels;
+        }
+
+        /// <summary>
+        /// Gets the channels from the DB, and optionally gets just one based on input file.
+        /// If channel is not found, don't automatically create it, since
+        /// this helps prevent typos/bad data. Assume admin creates channel manually.
+        /// </summary>
+        /// <returns></returns>
+        private static List<CaptionType> GetCaptionTypes(SqliteConnection connection)
+        {
+            var select = connection.CreateCommand();
+            select.CommandText = "SELECT caption_type_id, name FROM caption_type";
+
+            var captionTypes = new List<CaptionType>();
+            using (var reader = select.ExecuteReader())
+            {
+                while (reader.Read())
+                {
+                    captionTypes.Add(new CaptionType() { CaptionTypeId = reader.GetInt32(0), Name = reader.GetString(1) });
+                }
+            }
+
+            return captionTypes;
         }
 
         /// <summary>
@@ -127,7 +165,7 @@ namespace DunkSearch.Importer
         /// <param name="dataContext"></param>
         /// <param name="captionTypes"></param>
         /// <param name="channel"></param>
-        private static void ProcessFile(string filePath, DataContext dataContext, List<CaptionType> captionTypes, List<Channel> channels)
+        private static void ProcessFile(string filePath, SqliteConnection connection, List<CaptionType> captionTypes, List<Channel> channels)
         {
             Console.WriteLine("Processing file " + filePath);
             string jsonFileContent = File.ReadAllText(filePath);
@@ -154,8 +192,8 @@ namespace DunkSearch.Importer
                 channel = channels[0];
             }
 
-            var video = GetVideo(dataContext, videoExtract, channel, captionTypeId);
-            SaveCaptions(dataContext, video, videoExtract, captionTypeId);
+            var video = GetVideo(connection, videoExtract, channel, captionTypeId);
+            SaveCaptions(connection, video, videoExtract, captionTypeId);
         }
 
         /// <summary>
@@ -167,33 +205,64 @@ namespace DunkSearch.Importer
         /// <param name="channel"></param>
         /// <param name="captionTypeId"></param>
         /// <returns></returns>
-        private static Video GetVideo(DataContext dataContext, VideoExtract videoExtract, Channel channel, int captionTypeId)
+        private static Video GetVideo(SqliteConnection connection, VideoExtract videoExtract, Channel channel, int captionTypeId)
         {
+            // TODO might be a slight issue here with daylight savings time if you run it for a video created a while back...
+            // but odds of it being an issue are very low so ignore until it happens.
+            var unixSeconds = ((DateTimeOffset)videoExtract.UploadDateAsDate).ToUnixTimeSeconds();
+
             // check if a video with this title and date already exists.
-            var video = dataContext.Videos.Where(p => p.Title == videoExtract.Title && p.UploadDate == videoExtract.UploadDateAsDate).FirstOrDefault();
-            if (video == null)
+            var select = connection.CreateCommand();
+            select.CommandText = "SELECT video_id, title FROM video WHERE title = $title AND upload_date = $uploadDate";
+            select.Parameters.AddWithValue("$title", videoExtract.Title);
+            select.Parameters.AddWithValue("$uploadDate", unixSeconds);
+            var videos = new List<Video>();
+            using (var reader = select.ExecuteReader())
             {
-                // create video
-                video = new Video()
+                while (reader.Read())
                 {
+                    videos.Add(new Video() { VideoId = reader.GetInt32(0), Title = reader.GetString(1) });
+                }
+            }
+
+            if (!videos.Any())
+            {
+                var insert = connection.CreateCommand();
+                insert.CommandText = "INSERT INTO video (channel_id, title, yt_video_id, upload_date) VALUES ($channel_id, $title, $yt_video_id, $upload_date)";
+                var channel_id = insert.Parameters.Add("channel_id", SqliteType.Integer);
+                channel_id.Value = channel.ChannelId;
+                var title = insert.Parameters.Add("title", SqliteType.Text);
+                title.Value = videoExtract.Title;
+                var yt_video_id = insert.Parameters.Add("yt_video_id", SqliteType.Text);
+                yt_video_id.Value = videoExtract.Id;
+                var upload_date = insert.Parameters.Add("upload_date", SqliteType.Integer);
+                upload_date.Value = unixSeconds;
+                insert.ExecuteNonQuery();
+
+                var lastId = connection.CreateCommand();
+                lastId.CommandText = "SELECT last_insert_rowid()";
+
+                return new Video()
+                {
+                    VideoId = Convert.ToInt32(lastId.ExecuteScalar()),
                     ChannelId = channel.ChannelId,
                     Title = videoExtract.Title,
                     UploadDate = videoExtract.UploadDateAsDate,
                     YTVideoId = videoExtract.Id
                 };
-                dataContext.Add(video);
-                dataContext.SaveChanges();
             }
             else
             {
                 // find existing captions for this video and caption language,
                 // then and delete them so we can use the latest captions instead
-                var oldCaptions = dataContext.Captions.Where(p => p.VideoId == video.VideoId && p.CaptionTypeId == captionTypeId);
-                dataContext.RemoveRange(oldCaptions);
-                dataContext.SaveChanges();
-            }
+                var delete = connection.CreateCommand();
+                delete.CommandText = "DELETE FROM caption WHERE video_id = $videoId AND caption_type_id = $captionTypeId";
+                delete.Parameters.AddWithValue("$videoId", videos.First().VideoId);
+                delete.Parameters.AddWithValue("$captionTypeId", captionTypeId);
+                delete.ExecuteNonQuery();
 
-            return video;
+                return videos.First();
+            }
         }
 
         /// <summary>
@@ -203,22 +272,28 @@ namespace DunkSearch.Importer
         /// <param name="video"></param>
         /// <param name="videoExtract"></param>
         /// <param name="captionTypeId"></param>
-        private static void SaveCaptions(DataContext dataContext, Video video, VideoExtract videoExtract, int captionTypeId)
+        private static void SaveCaptions(SqliteConnection connection, Video video, VideoExtract videoExtract, int captionTypeId)
         {
             // add the caption records for each line in the input
-            var captionsToAdd = new List<Caption>();
-            foreach (var videoExtractCaption in videoExtract.Transcript)
+            using (var transaction = connection.BeginTransaction())
             {
-                captionsToAdd.Add(new Caption()
+                var insert = connection.CreateCommand();
+                insert.CommandText = "INSERT INTO caption (video_id, caption_type_id, start_seconds, caption_text) VALUES ($video_id, $caption_type_id, $start_seconds, $caption_text)";
+                var caption_id = insert.Parameters.Add("caption_id", SqliteType.Integer);
+                var video_id = insert.Parameters.Add("video_id", SqliteType.Integer);
+                var caption_type_id = insert.Parameters.Add("caption_type_id", SqliteType.Integer);
+                var start_seconds = insert.Parameters.Add("start_seconds", SqliteType.Integer);
+                var caption_text = insert.Parameters.Add("caption_text", SqliteType.Text);
+                foreach (var videoExtractCaption in videoExtract.Transcript)
                 {
-                    VideoId = video.VideoId,
-                    CaptionTypeId = captionTypeId,
-                    StartSeconds = videoExtractCaption.StartSeconds,
-                    CaptionText = videoExtractCaption.Caption
-                });
+                    video_id.Value = video.VideoId;
+                    caption_type_id.Value = captionTypeId;
+                    start_seconds.Value = videoExtractCaption.StartSeconds;
+                    caption_text.Value = videoExtractCaption.Caption;
+                    insert.ExecuteNonQuery();
+                }
+                transaction.Commit();
             }
-            dataContext.AddRange(captionsToAdd);
-            dataContext.SaveChanges();
         }
     }
 }
